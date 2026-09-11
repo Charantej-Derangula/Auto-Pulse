@@ -183,9 +183,9 @@ export function DashboardView() {
               key={idx}
               className={alert.type === 'danger' ? 'alert-banner-warning' : 'alert-banner-info'}
               style={{
-                background: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
-                borderColor: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.35)',
-                color: alert.type === 'danger' ? '#fca5a5' : 'var(--accent-amber)',
+                background: alert.type === 'danger' ? '#FDE8E8' : '#FDF3E8',
+                borderColor: alert.type === 'danger' ? '#F8BEBE' : '#F6D6B4',
+                color: alert.type === 'danger' ? '#C84B4B' : 'var(--accent-amber)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -196,10 +196,10 @@ export function DashboardView() {
               }}
             >
               <div className="flex-center-gap">
-                {alert.type === 'danger' ? <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0 }} /> : <AlertTriangle size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+                {alert.type === 'danger' ? <AlertCircle size={18} style={{ color: '#C84B4B', flexShrink: 0 }} /> : <AlertCircle size={18} style={{ color: '#D9822B', flexShrink: 0 }} />}
                 <div>
-                  <strong style={{ display: 'block', fontSize: '14px' }}>{alert.title}</strong>
-                  <span style={{ fontSize: '12px', opacity: 0.9 }}>{alert.desc}</span>
+                  <strong style={{ display: 'block', fontSize: '14px', color: 'var(--text-main)' }}>{alert.title}</strong>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{alert.desc}</span>
                 </div>
               </div>
 
@@ -208,8 +208,6 @@ export function DashboardView() {
                 style={{
                   fontSize: '12px',
                   padding: '6px 14px',
-                  borderColor: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.4)',
-                  color: 'white',
                   width: 'auto'
                 }}
                 onClick={() => {
