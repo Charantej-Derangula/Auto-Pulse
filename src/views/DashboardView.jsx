@@ -31,6 +31,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
 import { calculateDocumentStatus, calculateReminderStatus } from '../services/DocumentService';
+import { getVehicleImage, NEUTRAL_VEHICLE_FALLBACK } from '../services/VehicleService';
 
 export function DashboardView() {
   const navigate = useNavigate();
@@ -343,12 +344,12 @@ export function DashboardView() {
 
           <div className="car-backdrop-visual">
             <img
-              src={vehicle?.image || vehicle?.imageUrl || "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80"}
+              src={getVehicleImage(vehicle) || vehicle?.image || vehicle?.imageUrl || NEUTRAL_VEHICLE_FALLBACK}
               alt={`${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''}`}
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.onerror = null;
-                e.currentTarget.src = "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80";
+                e.currentTarget.src = NEUTRAL_VEHICLE_FALLBACK;
               }}
             />
           </div>

@@ -19,6 +19,7 @@ import {
   Cpu,
   AlertCircle
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   VEHICLE_SYSTEMS,
@@ -29,10 +30,12 @@ import {
 } from '../services/DiagnosisService';
 
 export function DiagnoseIssueView() {
+  const navigate = useNavigate();
   const { 
     vehicle, 
     vehicleHealth, 
-    setActiveTab 
+    setActiveTab,
+    addMaintenanceItem
   } = useApp();
 
   // Form input state
@@ -460,7 +463,10 @@ export function DiagnoseIssueView() {
               <div className="diag-actions-col">
                 <button 
                   className="primary-button flex-center-gap"
-                  onClick={() => setActiveTab('Find Garage')}
+                  onClick={() => {
+                    navigate('/find-garage');
+                    if (setActiveTab) setActiveTab('Find Garage');
+                  }}
                 >
                   <Wrench size={16} />
                   <span>Book Diagnosis at Garage</span>
@@ -468,7 +474,23 @@ export function DiagnoseIssueView() {
 
                 <button 
                   className="outline-button flex-center-gap"
-                  onClick={() => setActiveTab('Service & Maintenance')}
+                  onClick={() => {
+                    if (currentDiagnosis) {
+                      addMaintenanceItem({
+                        id: 'maint-diag-' + Date.now(),
+                        title: `Inspect: ${currentDiagnosis.primaryIssue || currentDiagnosis.reportedSymptoms || 'Diagnostic Issue'}`,
+                        category: currentDiagnosis.system || 'Diagnostics',
+                        dueOdometer: Number(vehicle?.odometer || 42680) + 500,
+                        dueDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+                        notes: `${currentDiagnosis.recommendedAction || ''} (Code: ${currentDiagnosis.dtcCode || 'N/A'})`,
+                        completed: false,
+                        completedDate: null,
+                        vehicleId: currentVehicleId
+                      });
+                    }
+                    navigate('/maintenance');
+                    if (setActiveTab) setActiveTab('Service & Maintenance');
+                  }}
                 >
                   <span>Add to Service Checklist</span>
                   <ChevronRight size={16} />

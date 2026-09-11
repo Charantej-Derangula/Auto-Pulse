@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Car,
   Edit3,
@@ -18,8 +19,10 @@ import {
 import { useApp, DEMO_VEHICLES } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
 import { calculateDocumentStatus } from '../services/DocumentService';
+import { getVehicleImage, NEUTRAL_VEHICLE_FALLBACK } from '../services/VehicleService';
 
 export function MyVehicleView() {
+  const navigate = useNavigate();
   const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError, vehicleHealth, documents } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(vehicle || DEMO_VEHICLES[0]);
@@ -34,7 +37,7 @@ export function MyVehicleView() {
   }, [vehicle]);
 
   const handleSelectDemo = async (e) => {
-    const selected = DEMO_VEHICLES.find(v => v.model === e.target.value);
+    const selected = DEMO_VEHICLES.find(v => v.id === e.target.value || v.model === e.target.value);
     if (selected) {
       setFormData(selected);
       await setVehicle(selected);
@@ -53,10 +56,11 @@ export function MyVehicleView() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    // Preserve stable unique vehicleId during details editing
+    // Preserve stable unique vehicleId during details editing while synchronizing exact make/model & image
     const updated = {
       ...formData,
-      id: vehicle?.id || formData.id || `${formData.manufacturer?.toLowerCase()}-${formData.model?.toLowerCase()}`
+      id: vehicle?.id || formData.id || `${formData.manufacturer?.toLowerCase()}-${formData.model?.toLowerCase()}`,
+      displayName: `${formData.manufacturer?.trim() || ''} ${formData.model?.trim() || ''}`.trim()
     };
     await setVehicle(updated);
     setIsEditing(false);
@@ -116,10 +120,10 @@ export function MyVehicleView() {
 
           <div className="demo-selector-row">
             <label>Quick Select Demo Model:</label>
-            <select className="simple-input" onChange={handleSelectDemo} defaultValue={vehicle?.model || ''}>
+            <select className="simple-input" onChange={handleSelectDemo} value={vehicle?.id || ''}>
               <option value="" disabled>Choose a vehicle preset...</option>
               {DEMO_VEHICLES.map(v => (
-                <option key={v.model} value={v.model}>
+                <option key={v.id} value={v.id}>
                   {v.manufacturer} {v.model} ({v.variant} • {v.type})
                 </option>
               ))}
@@ -232,12 +236,12 @@ export function MyVehicleView() {
       <div className="vehicle-profile-hero">
         <div className="vehicle-profile-image-wrap">
           <img 
-            src={vehicle?.image || vehicle?.imageUrl || "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80"} 
+            src={getVehicleImage(vehicle) || vehicle?.image || vehicle?.imageUrl || NEUTRAL_VEHICLE_FALLBACK} 
             alt={`${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''}`}
             loading="lazy"
             onError={(e) => {
               e.currentTarget.onerror = null;
-              e.currentTarget.src = "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80";
+              e.currentTarget.src = NEUTRAL_VEHICLE_FALLBACK;
             }}
           />
           <div className="hero-vehicle-badge">
@@ -294,11 +298,25 @@ export function MyVehicleView() {
           </div>
 
           <div className="v-action-row">
-            <button className="primary-button" style={{ width: 'auto', padding: '10px 22px' }} onClick={() => setActiveTab('Service & Maintenance')}>
+            <button 
+              className="primary-button" 
+              style={{ width: 'auto', padding: '10px 22px' }} 
+              onClick={() => {
+                navigate('/maintenance');
+                if (setActiveTab) setActiveTab('Service & Maintenance');
+              }}
+            >
               <Wrench size={16} />
               <span>Schedule Inspection</span>
             </button>
-            <button className="outline-button" style={{ width: 'auto', padding: '10px 22px' }} onClick={() => setActiveTab('Documents')}>
+            <button 
+              className="outline-button" 
+              style={{ width: 'auto', padding: '10px 22px' }} 
+              onClick={() => {
+                navigate('/documents');
+                if (setActiveTab) setActiveTab('Documents');
+              }}
+            >
               <FileText size={16} />
               <span>View Documents</span>
             </button>

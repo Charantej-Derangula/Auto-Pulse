@@ -595,7 +595,7 @@ export function ServiceMaintenanceView() {
           className={`filter-pill ${activeSubTab === 'history' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('history')}
         >
-          Service Records & Bookings ({serviceHistory.length})
+          Service Records & Bookings ({normalizedHistory.length})
         </button>
         <button 
           className={`filter-pill ${activeSubTab === 'expenses' ? 'active' : ''}`}
