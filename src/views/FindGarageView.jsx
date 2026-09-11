@@ -469,7 +469,7 @@ export function FindGarageView() {
                   <label>Vehicle Selected</label>
                   <input 
                     className="simple-input" 
-                    value={`${vehicle?.manufacturer} ${vehicle?.model} (${vehicle?.regNumber || 'TS 09 FH 4821'})`} 
+                    value={vehicle ? `${vehicle.manufacturer || ''} ${vehicle.model || ''}${vehicle.regNumber ? ` (${vehicle.regNumber})` : ''}`.trim() : 'No Vehicle Selected'} 
                     readOnly 
                   />
                 </div>

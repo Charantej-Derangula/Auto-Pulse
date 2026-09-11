@@ -144,4 +144,25 @@ describe('React Rules of Hooks Order Integrity Suite', () => {
       expect(html2).toContain('Creta');
     }).not.toThrow();
   });
+
+  it('5. DashboardView renders cinematic automotive background layer behind content with aria-hidden', () => {
+    const creta = DEMO_VEHICLES.find(v => v.id === 'hyundai-creta');
+    store['autopulse_auth'] = 'true';
+    store['garage_vehicle'] = JSON.stringify(creta);
+
+    const html = renderToString(
+      <AppProvider>
+        <MemoryRouter>
+          <DashboardView />
+        </MemoryRouter>
+      </AppProvider>
+    );
+
+    expect(html).toContain('dashboard-cinematic-bg');
+    expect(html).toContain('ambient-beam-1');
+    expect(html).toContain('ambient-beam-2');
+    expect(html).toContain('ambient-sweep');
+    expect(html).toContain('ambient-radial-glow');
+    expect(html).toContain('aria-hidden="true"');
+  });
 });

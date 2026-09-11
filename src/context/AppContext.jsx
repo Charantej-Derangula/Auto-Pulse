@@ -22,305 +22,7 @@ import {
 
 const AppContext = createContext();
 
-export const DEMO_VEHICLES = [
-  {
-    id: 'honda-city',
-    vehicleId: 'honda-city',
-    manufacturer: 'Honda',
-    make: 'Honda',
-    model: 'City',
-    modelYear: '2023',
-    chassisNumber: 'MAKGM668NP0192834',
-    engineNumber: 'L15Z-8891024',
-    variant: 'ZX CVT',
-    year: '2023',
-    type: 'Petrol',
-    odometer: 42680,
-    fuelCapacity: 40,
-    fuelLevel: 68,
-    vin: 'MAKGM668NP0192834',
-    regNumber: 'TS 09 FH 4821',
-    insuranceExpiry: '2026-11-20',
-    pucExpiry: '2026-10-15',
-    serviceDueKm: 50000,
-    healthScore: 94,
-    healthStatus: 'Good Condition',
-    displayName: 'Honda City',
-    image: getVehicleImage('Honda', 'City'),
-    imageUrl: getVehicleImage('Honda', 'City'),
-    subsystems: {
-      engine: { name: 'Engine / Powertrain', health: 92, status: 'Optimal' },
-      battery: { name: '12V Starter Battery', health: 90, status: 'Good (12.6V)' },
-      brakes: { name: 'Brake Pads & Rotors', health: 85, status: '6.5mm front / 7mm rear' },
-      tyres: { name: 'Tyre Tread Life', health: 78, status: '32 PSI all round' },
-      fluids: { name: 'Fluids & Coolants', health: 95, status: 'Levels within limits' }
-    }
-  },
-  {
-    id: 'hyundai-creta',
-    vehicleId: 'hyundai-creta',
-    manufacturer: 'Hyundai',
-    make: 'Hyundai',
-    model: 'Creta',
-    modelYear: '2022',
-    chassisNumber: 'MALC581DLM0482910',
-    engineNumber: 'D4FA-3918291',
-    variant: 'SX(O) Turbo',
-    year: '2022',
-    type: 'Diesel',
-    odometer: 35000,
-    fuelCapacity: 50,
-    fuelLevel: 82,
-    vin: 'MALC581DLM0482910',
-    regNumber: 'TS 07 EA 9901',
-    insuranceExpiry: '2026-08-10',
-    pucExpiry: '2026-12-05',
-    serviceDueKm: 40000,
-    healthScore: 91,
-    healthStatus: 'Good Condition',
-    displayName: 'Hyundai Creta',
-    image: getVehicleImage('Hyundai', 'Creta'),
-    imageUrl: getVehicleImage('Hyundai', 'Creta'),
-    subsystems: {
-      engine: { name: 'CRDi Turbo Diesel', health: 90, status: 'Smooth idle' },
-      battery: { name: '12V Battery', health: 88, status: 'Healthy' },
-      brakes: { name: 'Disc Brakes', health: 82, status: 'Brake fluid fresh' },
-      tyres: { name: 'Tyre Tread', health: 74, status: '34 PSI' },
-      fluids: { name: 'DEF & Oil', health: 91, status: 'DEF at 75%' }
-    }
-  },
-  {
-    id: 'hyundai-venue',
-    vehicleId: 'hyundai-venue',
-    manufacturer: 'Hyundai',
-    make: 'Hyundai',
-    model: 'Venue',
-    modelYear: '2023',
-    chassisNumber: 'MALV729KLP0038192',
-    engineNumber: 'G3LC-4418290',
-    variant: 'SX(O) 1.0 Turbo DCT',
-    year: '2023',
-    type: 'Petrol',
-    odometer: 18400,
-    fuelCapacity: 45,
-    fuelLevel: 75,
-    vin: 'MALV729KLP0038192',
-    regNumber: 'TS 08 HG 5511',
-    insuranceExpiry: '2027-03-15',
-    pucExpiry: '2027-03-15',
-    serviceDueKm: 25000,
-    healthScore: 95,
-    healthStatus: 'Excellent Condition',
-    displayName: 'Hyundai Venue',
-    image: getVehicleImage('Hyundai', 'Venue'),
-    imageUrl: getVehicleImage('Hyundai', 'Venue'),
-    subsystems: {
-      engine: { name: 'Kappa 1.0 Turbo GDi', health: 95, status: 'Optimal' },
-      battery: { name: '12V Starter Battery', health: 94, status: '12.7V' },
-      brakes: { name: 'Front Disc / Rear Drum', health: 92, status: 'Good' },
-      tyres: { name: 'MRF Wanderer Tyres', health: 90, status: '33 PSI' },
-      fluids: { name: 'Engine Oil & Coolant', health: 96, status: 'Fresh' }
-    }
-  },
-  {
-    id: 'tata-nexon',
-    vehicleId: 'tata-nexon',
-    manufacturer: 'Tata',
-    make: 'Tata',
-    model: 'Nexon',
-    modelYear: '2024',
-    chassisNumber: 'MAT612984R0092182',
-    engineNumber: 'REV-1298102',
-    variant: 'Fearless+ DCA',
-    year: '2024',
-    type: 'Petrol',
-    odometer: 5000,
-    fuelCapacity: 44,
-    fuelLevel: 90,
-    vin: 'MAT612984R0092182',
-    regNumber: 'TS 08 KL 1122',
-    insuranceExpiry: '2027-02-14',
-    pucExpiry: '2027-02-14',
-    serviceDueKm: 10000,
-    healthScore: 98,
-    healthStatus: 'Excellent (Like New)',
-    displayName: 'Tata Nexon',
-    image: getVehicleImage('Tata', 'Nexon'),
-    imageUrl: getVehicleImage('Tata', 'Nexon'),
-    subsystems: {
-      engine: { name: 'Revotron Turbo Engine', health: 98, status: 'Factory spec' },
-      battery: { name: 'Battery 12V', health: 99, status: '12.8V Peak' },
-      brakes: { name: 'Front Disc / Rear Drum', health: 97, status: '9.2mm pad thickness' },
-      tyres: { name: 'Goodyear Tyres', health: 96, status: '33 PSI' },
-      fluids: { name: 'Coolant & Oil', health: 99, status: 'Pristine' }
-    }
-  },
-  {
-    id: 'mahindra-xuv700',
-    vehicleId: 'mahindra-xuv700',
-    manufacturer: 'Mahindra',
-    make: 'Mahindra',
-    model: 'XUV700',
-    modelYear: '2023',
-    chassisNumber: 'MA1TA2SKLP0019284',
-    engineNumber: 'mStallion-200918',
-    variant: 'AX7 Luxury Pack AWD',
-    year: '2023',
-    type: 'Diesel',
-    odometer: 22100,
-    fuelCapacity: 60,
-    fuelLevel: 80,
-    vin: 'MA1TA2SKLP0019284',
-    regNumber: 'TS 09 MX 7007',
-    insuranceExpiry: '2026-10-28',
-    pucExpiry: '2026-10-28',
-    serviceDueKm: 30000,
-    healthScore: 95,
-    healthStatus: 'Optimal ADAS & Powertrain',
-    displayName: 'Mahindra XUV700',
-    image: getVehicleImage('Mahindra', 'XUV700'),
-    imageUrl: getVehicleImage('Mahindra', 'XUV700'),
-    subsystems: {
-      engine: { name: 'mHawk 2.2L Turbo Diesel', health: 96, status: 'Optimal' },
-      battery: { name: 'Heavy Duty 12V Battery', health: 93, status: 'Strong' },
-      brakes: { name: 'All 4 Disc ESP', health: 91, status: 'Pads at 80%' },
-      tyres: { name: 'Apollo Apterra Tyres', health: 87, status: '34 PSI' },
-      fluids: { name: 'Transmission & DEF', health: 98, status: 'Optimal' }
-    }
-  },
-  {
-    id: 'toyota-fortuner',
-    vehicleId: 'toyota-fortuner',
-    manufacturer: 'Toyota',
-    make: 'Toyota',
-    model: 'Fortuner',
-    modelYear: '2023',
-    chassisNumber: 'MBJFT882KP0019281',
-    engineNumber: '1GD-FTV-882910',
-    variant: '4x4 Legender AT',
-    year: '2023',
-    type: 'Diesel',
-    odometer: 28900,
-    fuelCapacity: 80,
-    fuelLevel: 70,
-    vin: 'MBJFT882KP0019281',
-    regNumber: 'TS 07 TR 4444',
-    insuranceExpiry: '2027-04-10',
-    pucExpiry: '2027-04-10',
-    serviceDueKm: 35000,
-    healthScore: 97,
-    healthStatus: 'Rugged Peak Performance',
-    displayName: 'Toyota Fortuner',
-    image: getVehicleImage('Toyota', 'Fortuner'),
-    imageUrl: getVehicleImage('Toyota', 'Fortuner'),
-    subsystems: {
-      engine: { name: '2.8L 1GD-FTV Diesel', health: 98, status: '500 Nm Torque Spec' },
-      battery: { name: 'Exide 12V 80Ah', health: 95, status: 'Good' },
-      brakes: { name: 'Ventilated Disc 4-Wheel', health: 94, status: 'Pad wear normal' },
-      tyres: { name: 'Bridgestone Dueler A/T', health: 89, status: '32 PSI' },
-      fluids: { name: '4WD Transfer Oil & DEF', health: 98, status: 'Normal' }
-    }
-  },
-  {
-    id: 'toyota-innova',
-    vehicleId: 'toyota-innova',
-    manufacturer: 'Toyota',
-    make: 'Toyota',
-    model: 'Innova HyCross',
-    modelYear: '2023',
-    chassisNumber: 'MBJTC681LP0029182',
-    engineNumber: 'M20A-FXS-99182',
-    variant: 'ZX(O) Hybrid',
-    year: '2023',
-    type: 'Hybrid',
-    odometer: 14200,
-    fuelCapacity: 52,
-    fuelLevel: 78,
-    vin: 'MBJTC681LP0029182',
-    regNumber: 'TS 09 XY 8899',
-    insuranceExpiry: '2027-01-10',
-    pucExpiry: '2027-01-10',
-    serviceDueKm: 20000,
-    healthScore: 96,
-    healthStatus: 'Optimal Hybrid Drive',
-    displayName: 'Toyota Innova HyCross',
-    image: getVehicleImage('Toyota', 'Innova HyCross'),
-    imageUrl: getVehicleImage('Toyota', 'Innova HyCross'),
-    subsystems: {
-      engine: { name: 'Dynamic Force 2.0L Hybrid', health: 97, status: 'Optimal e-CVT' },
-      battery: { name: 'Ni-MH Hybrid Battery', health: 98, status: 'Regen healthy' },
-      brakes: { name: 'All 4 Disc with ABS', health: 94, status: 'Good condition' },
-      tyres: { name: 'Bridgestone Turanza', health: 88, status: '35 PSI' },
-      fluids: { name: 'Inverter Coolant', health: 99, status: 'Level normal' }
-    }
-  },
-  {
-    id: 'tesla-m3',
-    vehicleId: 'tesla-m3',
-    manufacturer: 'Tesla',
-    make: 'Tesla',
-    model: 'Model 3',
-    modelYear: '2024',
-    chassisNumber: '5YJ3E1EB9PF901238',
-    engineNumber: 'DUAL-MOTOR-3D1',
-    variant: 'Long Range AWD',
-    year: '2024',
-    type: 'EV',
-    odometer: 8400,
-    fuelCapacity: 82, // kWh
-    fuelLevel: 84, // %
-    vin: '5YJ3E1EB9PF901238',
-    regNumber: 'TS 10 EV 0001',
-    insuranceExpiry: '2027-05-18',
-    pucExpiry: 'Exempt (EV)',
-    serviceDueKm: 20000,
-    healthScore: 99,
-    healthStatus: 'Peak Battery Performance',
-    displayName: 'Tesla Model 3',
-    image: getVehicleImage('Tesla', 'Model 3'),
-    imageUrl: getVehicleImage('Tesla', 'Model 3'),
-    subsystems: {
-      engine: { name: 'Dual Electric Drive', health: 100, status: 'Dual Motor Sync' },
-      battery: { name: 'High-Voltage Battery', health: 98.4, status: '1.6% Degradation' },
-      brakes: { name: 'Regen + Friction Brakes', health: 96, status: 'Regen active' },
-      tyres: { name: 'Michelin Pilot Sport EV', health: 90, status: '41 PSI cold' },
-      fluids: { name: 'Thermal Management', health: 99, status: 'Glycol coolant intact' }
-    }
-  },
-  {
-    id: 'tata-nexon-ev',
-    vehicleId: 'tata-nexon-ev',
-    manufacturer: 'Tata',
-    make: 'Tata',
-    model: 'Nexon EV',
-    modelYear: '2024',
-    chassisNumber: 'MAT612984R0095541',
-    engineNumber: 'ZIPTRON-EV-405',
-    variant: 'Empowered+ LR',
-    year: '2024',
-    type: 'EV',
-    odometer: 6200,
-    fuelCapacity: 40.5, // kWh
-    fuelLevel: 88, // %
-    vin: 'MAT612984R0095541',
-    regNumber: 'TS 09 EV 4040',
-    insuranceExpiry: '2027-04-12',
-    pucExpiry: 'Exempt (EV)',
-    serviceDueKm: 15000,
-    healthScore: 99,
-    healthStatus: 'High Voltage Ziptron Optimal',
-    displayName: 'Tata Nexon EV',
-    image: getVehicleImage('Tata', 'Nexon EV'),
-    imageUrl: getVehicleImage('Tata', 'Nexon EV'),
-    subsystems: {
-      engine: { name: 'Ziptron Permanent Magnet Motor', health: 99, status: 'Optimal' },
-      battery: { name: '40.5 kWh LFP Battery Pack', health: 99.2, status: 'Liquid cooled' },
-      brakes: { name: 'Smart Regenerative Braking', health: 97, status: '3-level regen active' },
-      tyres: { name: 'Low Rolling Resistance Tyres', health: 95, status: '34 PSI' },
-      fluids: { name: 'Coolant for Inverter & Motor', health: 98, status: 'Good' }
-    }
-  }
-];
+export { DEMO_VEHICLES } from '../services/VehicleService';
 
 export const INITIAL_DIAGNOSTICS = [
   {
@@ -1101,6 +803,7 @@ export function AppProvider({ children }) {
 
   // Vehicle Health State (External Telemetry Service Abstraction & Fallback Engine)
   const [vehicleHealth, setVehicleHealth] = useState(() => {
+    if (!vehicle) return null;
     const initialAssessment = calculateVehicleHealth(vehicle, INITIAL_SERVICE_HISTORY, 'brake-noise', INITIAL_DIAGNOSTICS);
     return {
       overallScore: initialAssessment.overallScore || 94,
@@ -1230,10 +933,16 @@ export function AppProvider({ children }) {
   // 4. Evaluate Vehicle Health Telemetry via VehicleHealthService
   useEffect(() => {
     let isMounted = true;
+    if (!vehicle) {
+      setVehicleHealth(null);
+      setIsVehicleHealthLoading(false);
+      return;
+    }
+
     setIsVehicleHealthLoading(true);
-    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
-    const vehicleServices = Array.isArray(serviceHistory) 
-      ? serviceHistory.filter(s => s.vehicleId === currentVId || (!s.vehicleId && currentVId === 'honda-city'))
+    const currentVId = vehicle?.id || vehicle?.vehicleId || null;
+    const vehicleServices = Array.isArray(serviceHistory) && currentVId
+      ? serviceHistory.filter(s => s.vehicleId === currentVId || s.vehicleId === vehicle?.model?.toLowerCase())
       : [];
 
     getVehicleHealthAssessment(vehicle, vehicleServices, selectedDiagnosticId, diagnostics)
@@ -1309,11 +1018,11 @@ export function AppProvider({ children }) {
   };
 
   const addReminder = (newRem) => {
-    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+    const currentVId = vehicle?.id || vehicle?.vehicleId || null;
     const normalized = normalizeReminder({
       ...newRem,
       vehicleId: newRem.vehicleId || currentVId,
-      vehicle: newRem.vehicle || `${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''} (${vehicle?.regNumber || 'TS 09 FH 4821'})`
+      vehicle: newRem.vehicle || (vehicle ? `${vehicle.manufacturer} ${vehicle.model} (${vehicle.regNumber || ''})` : 'Vehicle')
     }, currentVId);
     setReminders(prev => [normalized, ...prev]);
   };
@@ -1324,7 +1033,7 @@ export function AppProvider({ children }) {
 
   // Document methods
   const addDocument = (doc) => {
-    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+    const currentVId = vehicle?.id || vehicle?.vehicleId || null;
     const normalized = normalizeDocument({
       ...doc,
       vehicleId: doc.vehicleId || currentVId

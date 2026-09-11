@@ -79,6 +79,410 @@ export const VEHICLE_IMAGES = {
   "Tata Nexon EV": "/assets/vehicles/tata-nexon-ev.jpg"
 };
 
+// Verified OEM library models for onboarding catalog
+export const PRESET_VEHICLES = [
+  {
+    id: 'honda-city',
+    name: 'Honda City',
+    manufacturer: 'Honda',
+    model: 'City',
+    modelYear: '2023',
+    variant: '1.5 i-VTEC V',
+    type: 'Petrol',
+    fuelCapacity: 40,
+    image: '/assets/vehicles/honda-city.jpg'
+  },
+  {
+    id: 'hyundai-creta',
+    name: 'Hyundai Creta',
+    manufacturer: 'Hyundai',
+    model: 'Creta',
+    modelYear: '2024',
+    variant: 'SX(O) Turbo',
+    type: 'Diesel',
+    fuelCapacity: 50,
+    image: '/assets/vehicles/hyundai-creta.jpg'
+  },
+  {
+    id: 'hyundai-venue',
+    name: 'Hyundai Venue',
+    manufacturer: 'Hyundai',
+    model: 'Venue',
+    modelYear: '2024',
+    variant: 'SX(O) 1.0 Turbo DCT',
+    type: 'Petrol',
+    fuelCapacity: 45,
+    image: '/assets/vehicles/hyundai-venue.jpg'
+  },
+  {
+    id: 'tata-nexon',
+    name: 'Tata Nexon',
+    manufacturer: 'Tata',
+    model: 'Nexon',
+    modelYear: '2024',
+    variant: 'Fearless+ DCA',
+    type: 'Petrol',
+    fuelCapacity: 44,
+    image: '/assets/vehicles/tata-nexon.jpg'
+  },
+  {
+    id: 'mahindra-xuv700',
+    name: 'Mahindra XUV700',
+    manufacturer: 'Mahindra',
+    model: 'XUV700',
+    modelYear: '2024',
+    variant: 'AX7 Luxury Pack',
+    type: 'Diesel',
+    fuelCapacity: 60,
+    image: '/assets/vehicles/mahindra-xuv700.png'
+  },
+  {
+    id: 'toyota-fortuner',
+    name: 'Toyota Fortuner',
+    manufacturer: 'Toyota',
+    model: 'Fortuner',
+    modelYear: '2024',
+    variant: '2.8 4x4 AT',
+    type: 'Diesel',
+    fuelCapacity: 80,
+    image: '/assets/vehicles/toyota-fortuner.jpg'
+  },
+  {
+    id: 'toyota-innova-hycross',
+    name: 'Toyota Innova HyCross',
+    manufacturer: 'Toyota',
+    model: 'Innova HyCross',
+    modelYear: '2024',
+    variant: 'ZX(O) Hybrid',
+    type: 'Strong Hybrid',
+    fuelCapacity: 52,
+    image: '/assets/vehicles/toyota-innova-hycross.jpg'
+  },
+  {
+    id: 'tesla-model-3',
+    name: 'Tesla Model 3',
+    manufacturer: 'Tesla',
+    model: 'Model 3',
+    modelYear: '2024',
+    variant: 'Long Range AWD',
+    type: 'Electric (EV)',
+    fuelCapacity: 82,
+    image: '/assets/vehicles/tesla-model-3.jpg'
+  },
+  {
+    id: 'tata-nexon-ev',
+    name: 'Tata Nexon EV',
+    manufacturer: 'Tata',
+    model: 'Nexon EV',
+    modelYear: '2024',
+    variant: 'Empowered+ LR',
+    type: 'Electric (EV)',
+    fuelCapacity: 82,
+    image: '/assets/vehicles/tata-nexon-ev.jpg'
+  }
+];
+
+// Verified OEM Presets with full CAN-bus telemetry for manual switching
+export const DEMO_VEHICLES = [
+  {
+    id: 'honda-city',
+    vehicleId: 'honda-city',
+    manufacturer: 'Honda',
+    make: 'Honda',
+    model: 'City',
+    modelYear: '2023',
+    chassisNumber: 'MAKGM668NP0192834',
+    engineNumber: 'L15Z-8891024',
+    variant: 'ZX CVT',
+    year: '2023',
+    type: 'Petrol',
+    odometer: 42680,
+    fuelCapacity: 40,
+    fuelLevel: 68,
+    vin: 'MAKGM668NP0192834',
+    regNumber: 'TS 09 FH 4821',
+    insuranceExpiry: '2026-11-20',
+    pucExpiry: '2026-10-15',
+    serviceDueKm: 50000,
+    healthScore: 94,
+    healthStatus: 'Good Condition',
+    displayName: 'Honda City',
+    image: '/assets/vehicles/honda-city.jpg',
+    imageUrl: '/assets/vehicles/honda-city.jpg',
+    subsystems: {
+      engine: { name: 'Engine / Powertrain', health: 92, status: 'Optimal' },
+      battery: { name: '12V Starter Battery', health: 90, status: 'Good (12.6V)' },
+      brakes: { name: 'Brake Pads & Rotors', health: 85, status: '6.5mm front / 7mm rear' },
+      tyres: { name: 'Tyre Tread Life', health: 78, status: '32 PSI all round' },
+      fluids: { name: 'Fluids & Coolants', health: 95, status: 'Levels within limits' }
+    }
+  },
+  {
+    id: 'hyundai-creta',
+    vehicleId: 'hyundai-creta',
+    manufacturer: 'Hyundai',
+    make: 'Hyundai',
+    model: 'Creta',
+    modelYear: '2022',
+    chassisNumber: 'MALC581DLM0482910',
+    engineNumber: 'D4FA-3918291',
+    variant: 'SX(O) Turbo',
+    year: '2022',
+    type: 'Diesel',
+    odometer: 35000,
+    fuelCapacity: 50,
+    fuelLevel: 82,
+    vin: 'MALC581DLM0482910',
+    regNumber: 'TS 07 EA 9901',
+    insuranceExpiry: '2026-08-10',
+    pucExpiry: '2026-12-05',
+    serviceDueKm: 40000,
+    healthScore: 91,
+    healthStatus: 'Good Condition',
+    displayName: 'Hyundai Creta',
+    image: '/assets/vehicles/hyundai-creta.jpg',
+    imageUrl: '/assets/vehicles/hyundai-creta.jpg',
+    subsystems: {
+      engine: { name: 'CRDi Turbo Diesel', health: 90, status: 'Smooth idle' },
+      battery: { name: '12V Battery', health: 88, status: 'Healthy' },
+      brakes: { name: 'Disc Brakes', health: 82, status: 'Brake fluid fresh' },
+      tyres: { name: 'Tyre Tread', health: 74, status: '34 PSI' },
+      fluids: { name: 'DEF & Oil', health: 91, status: 'DEF at 75%' }
+    }
+  },
+  {
+    id: 'hyundai-venue',
+    vehicleId: 'hyundai-venue',
+    manufacturer: 'Hyundai',
+    make: 'Hyundai',
+    model: 'Venue',
+    modelYear: '2023',
+    chassisNumber: 'MALV729KLP0038192',
+    engineNumber: 'G3LC-4418290',
+    variant: 'SX(O) 1.0 Turbo DCT',
+    year: '2023',
+    type: 'Petrol',
+    odometer: 18400,
+    fuelCapacity: 45,
+    fuelLevel: 75,
+    vin: 'MALV729KLP0038192',
+    regNumber: 'TS 08 HG 5511',
+    insuranceExpiry: '2027-03-15',
+    pucExpiry: '2027-03-15',
+    serviceDueKm: 25000,
+    healthScore: 95,
+    healthStatus: 'Excellent Condition',
+    displayName: 'Hyundai Venue',
+    image: '/assets/vehicles/hyundai-venue.jpg',
+    imageUrl: '/assets/vehicles/hyundai-venue.jpg',
+    subsystems: {
+      engine: { name: 'Kappa 1.0 Turbo GDi', health: 95, status: 'Optimal' },
+      battery: { name: '12V Starter Battery', health: 94, status: '12.7V' },
+      brakes: { name: 'Front Disc / Rear Drum', health: 92, status: 'Good' },
+      tyres: { name: 'MRF Wanderer Tyres', health: 90, status: '33 PSI' },
+      fluids: { name: 'Engine Oil & Coolant', health: 96, status: 'Fresh' }
+    }
+  },
+  {
+    id: 'tata-nexon',
+    vehicleId: 'tata-nexon',
+    manufacturer: 'Tata',
+    make: 'Tata',
+    model: 'Nexon',
+    modelYear: '2024',
+    chassisNumber: 'MAT612984R0092182',
+    engineNumber: 'REV-1298102',
+    variant: 'Fearless+ DCA',
+    year: '2024',
+    type: 'Petrol',
+    odometer: 5000,
+    fuelCapacity: 44,
+    fuelLevel: 90,
+    vin: 'MAT612984R0092182',
+    regNumber: 'TS 08 KL 1122',
+    insuranceExpiry: '2027-02-14',
+    pucExpiry: '2027-02-14',
+    serviceDueKm: 10000,
+    healthScore: 98,
+    healthStatus: 'Excellent (Like New)',
+    displayName: 'Tata Nexon',
+    image: '/assets/vehicles/tata-nexon.jpg',
+    imageUrl: '/assets/vehicles/tata-nexon.jpg',
+    subsystems: {
+      engine: { name: 'Revotron Turbo Engine', health: 98, status: 'Factory spec' },
+      battery: { name: 'Battery 12V', health: 99, status: '12.8V Peak' },
+      brakes: { name: 'Front Disc / Rear Drum', health: 97, status: '9.2mm pad thickness' },
+      tyres: { name: 'Goodyear Tyres', health: 96, status: '33 PSI' },
+      fluids: { name: 'Coolant & Oil', health: 99, status: 'Pristine' }
+    }
+  },
+  {
+    id: 'mahindra-xuv700',
+    vehicleId: 'mahindra-xuv700',
+    manufacturer: 'Mahindra',
+    make: 'Mahindra',
+    model: 'XUV700',
+    modelYear: '2023',
+    chassisNumber: 'MA1TA2SKLP0019284',
+    engineNumber: 'mStallion-200918',
+    variant: 'AX7 Luxury Pack AWD',
+    year: '2023',
+    type: 'Diesel',
+    odometer: 22100,
+    fuelCapacity: 60,
+    fuelLevel: 80,
+    vin: 'MA1TA2SKLP0019284',
+    regNumber: 'TS 09 MX 7007',
+    insuranceExpiry: '2026-10-28',
+    pucExpiry: '2026-10-28',
+    serviceDueKm: 30000,
+    healthScore: 95,
+    healthStatus: 'Optimal ADAS & Powertrain',
+    displayName: 'Mahindra XUV700',
+    image: '/assets/vehicles/mahindra-xuv700.png',
+    imageUrl: '/assets/vehicles/mahindra-xuv700.png',
+    subsystems: {
+      engine: { name: 'mHawk 2.2L Turbo Diesel', health: 96, status: 'Optimal' },
+      battery: { name: 'Heavy Duty 12V Battery', health: 93, status: 'Strong' },
+      brakes: { name: 'All 4 Disc ESP', health: 91, status: 'Pads at 80%' },
+      tyres: { name: 'Apollo Apterra Tyres', health: 87, status: '34 PSI' },
+      fluids: { name: 'Transmission & DEF', health: 98, status: 'Optimal' }
+    }
+  },
+  {
+    id: 'toyota-fortuner',
+    vehicleId: 'toyota-fortuner',
+    manufacturer: 'Toyota',
+    make: 'Toyota',
+    model: 'Fortuner',
+    modelYear: '2023',
+    chassisNumber: 'MBJFT882KP0019281',
+    engineNumber: '1GD-FTV-882910',
+    variant: '4x4 Legender AT',
+    year: '2023',
+    type: 'Diesel',
+    odometer: 28900,
+    fuelCapacity: 80,
+    fuelLevel: 70,
+    vin: 'MBJFT882KP0019281',
+    regNumber: 'TS 07 TR 4444',
+    insuranceExpiry: '2027-04-10',
+    pucExpiry: '2027-04-10',
+    serviceDueKm: 35000,
+    healthScore: 97,
+    healthStatus: 'Rugged Peak Performance',
+    displayName: 'Toyota Fortuner',
+    image: '/assets/vehicles/toyota-fortuner.jpg',
+    imageUrl: '/assets/vehicles/toyota-fortuner.jpg',
+    subsystems: {
+      engine: { name: '2.8L 1GD-FTV Diesel', health: 98, status: '500 Nm Torque Spec' },
+      battery: { name: 'Exide 12V 80Ah', health: 95, status: 'Good' },
+      brakes: { name: 'Ventilated Disc 4-Wheel', health: 94, status: 'Pad wear normal' },
+      tyres: { name: 'Bridgestone Dueler A/T', health: 89, status: '32 PSI' },
+      fluids: { name: '4WD Transfer Oil & DEF', health: 98, status: 'Normal' }
+    }
+  },
+  {
+    id: 'toyota-innova',
+    vehicleId: 'toyota-innova',
+    manufacturer: 'Toyota',
+    make: 'Toyota',
+    model: 'Innova HyCross',
+    modelYear: '2023',
+    chassisNumber: 'MBJTC681LP0029182',
+    engineNumber: 'M20A-FXS-99182',
+    variant: 'ZX(O) Hybrid',
+    year: '2023',
+    type: 'Hybrid',
+    odometer: 14200,
+    fuelCapacity: 52,
+    fuelLevel: 78,
+    vin: 'MBJTC681LP0029182',
+    regNumber: 'TS 09 XY 8899',
+    insuranceExpiry: '2027-01-10',
+    pucExpiry: '2027-01-10',
+    serviceDueKm: 20000,
+    healthScore: 96,
+    healthStatus: 'Optimal Hybrid Drive',
+    displayName: 'Toyota Innova HyCross',
+    image: '/assets/vehicles/toyota-innova-hycross.jpg',
+    imageUrl: '/assets/vehicles/toyota-innova-hycross.jpg',
+    subsystems: {
+      engine: { name: 'Dynamic Force 2.0L Hybrid', health: 97, status: 'Optimal e-CVT' },
+      battery: { name: 'Ni-MH Hybrid Battery', health: 98, status: 'Regen healthy' },
+      brakes: { name: 'All 4 Disc with ABS', health: 94, status: 'Good condition' },
+      tyres: { name: 'Bridgestone Turanza', health: 88, status: '35 PSI' },
+      fluids: { name: 'Inverter Coolant', health: 99, status: 'Level normal' }
+    }
+  },
+  {
+    id: 'tesla-m3',
+    vehicleId: 'tesla-m3',
+    manufacturer: 'Tesla',
+    make: 'Tesla',
+    model: 'Model 3',
+    modelYear: '2024',
+    chassisNumber: '5YJ3E1EB9PF901238',
+    engineNumber: 'DUAL-MOTOR-3D1',
+    variant: 'Long Range AWD',
+    year: '2024',
+    type: 'EV',
+    odometer: 8400,
+    fuelCapacity: 82,
+    fuelLevel: 84,
+    vin: '5YJ3E1EB9PF901238',
+    regNumber: 'TS 10 EV 0001',
+    insuranceExpiry: '2027-05-18',
+    pucExpiry: 'Exempt (EV)',
+    serviceDueKm: 20000,
+    healthScore: 99,
+    healthStatus: 'Peak Battery Performance',
+    displayName: 'Tesla Model 3',
+    image: '/assets/vehicles/tesla-model-3.jpg',
+    imageUrl: '/assets/vehicles/tesla-model-3.jpg',
+    subsystems: {
+      engine: { name: 'Dual Electric Drive', health: 100, status: 'Dual Motor Sync' },
+      battery: { name: 'High-Voltage Battery', health: 98.4, status: '1.6% Degradation' },
+      brakes: { name: 'Regen + Friction Brakes', health: 96, status: 'Regen active' },
+      tyres: { name: 'Michelin Pilot Sport EV', health: 90, status: '41 PSI cold' },
+      fluids: { name: 'Thermal Management', health: 99, status: 'Glycol coolant intact' }
+    }
+  },
+  {
+    id: 'tata-nexon-ev',
+    vehicleId: 'tata-nexon-ev',
+    manufacturer: 'Tata',
+    make: 'Tata',
+    model: 'Nexon EV',
+    modelYear: '2024',
+    chassisNumber: 'MAT612984R0095541',
+    engineNumber: 'ZIPTRON-EV-405',
+    variant: 'Empowered+ LR',
+    year: '2024',
+    type: 'EV',
+    odometer: 6200,
+    fuelCapacity: 40.5,
+    fuelLevel: 88,
+    vin: 'MAT612984R0095541',
+    regNumber: 'TS 09 EV 4040',
+    insuranceExpiry: '2027-04-12',
+    pucExpiry: 'Exempt (EV)',
+    serviceDueKm: 15000,
+    healthScore: 99,
+    healthStatus: 'High Voltage Ziptron Optimal',
+    displayName: 'Tata Nexon EV',
+    image: '/assets/vehicles/tata-nexon-ev.jpg',
+    imageUrl: '/assets/vehicles/tata-nexon-ev.jpg',
+    subsystems: {
+      engine: { name: 'Ziptron Permanent Magnet Motor', health: 99, status: 'Optimal' },
+      battery: { name: '40.5 kWh LFP Battery Pack', health: 99.2, status: 'Liquid cooled' },
+      brakes: { name: 'Smart Regenerative Braking', health: 97, status: '3-level regen active' },
+      tyres: { name: 'Low Rolling Resistance Tyres', health: 95, status: '34 PSI' },
+      fluids: { name: 'Coolant for Inverter & Motor', health: 98, status: 'Good' }
+    }
+  }
+];
+
 // High-fidelity verified exact vehicle images (100% genuine vehicle photos matching exact make + model)
 export const VERIFIED_VEHICLE_IMAGES = {
   // 1. Honda City (Modern 4-Door Sedan)
@@ -330,16 +734,31 @@ export async function resolveVehicleImage(manufacturer = '', model = '', year = 
  * Helper to normalize and build safe vehicle object
  */
 export function buildVehicleObject(data, resolvedImage = null) {
-  const manufacturer = (data?.manufacturer || data?.make || 'Honda').trim();
-  const model = (data?.model || 'City').trim();
-  const displayName = `${manufacturer} ${model}`;
+  if (!data || typeof data !== 'object') {
+    return null;
+  }
+
+  const manufacturer = (data?.manufacturer || data?.make || '').trim();
+  const model = (data?.model || '').trim();
+
+  if (!manufacturer && !model) {
+    return null;
+  }
+
+  const displayName = manufacturer && model 
+    ? `${manufacturer} ${model}` 
+    : (data?.displayName || data?.name || manufacturer || model);
 
   const cleanMakeSlug = manufacturer.toLowerCase().replace(/[^a-z0-9]/g, '-');
   const cleanModelSlug = model.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  const stableId = data?.id || data?.vehicleId || `${cleanMakeSlug}-${cleanModelSlug}`;
+  const stableId = data?.id || data?.vehicleId || (cleanMakeSlug && cleanModelSlug ? `${cleanMakeSlug}-${cleanModelSlug}` : 'custom-vehicle');
 
   // Always use centralized resolver for guaranteed exact matching (prevents stale/wrong image carryover)
-  const exactImage = getVehicleImage({ manufacturer, model }) || resolvedImage || NEUTRAL_VEHICLE_FALLBACK;
+  const exactImage = (data?.imageUrl && data?.imageUrl !== NEUTRAL_VEHICLE_FALLBACK)
+    ? data.imageUrl
+    : (getVehicleImage({ manufacturer, model }) || resolvedImage || NEUTRAL_VEHICLE_FALLBACK);
+
+  const currentOdometer = typeof data?.odometer === 'number' ? data.odometer : (Number(data?.odometer) || 0);
 
   return {
     ...data,
@@ -348,28 +767,28 @@ export function buildVehicleObject(data, resolvedImage = null) {
     manufacturer,
     make: manufacturer,
     model,
-    modelYear: data?.modelYear || data?.year || '2023',
-    chassisNumber: data?.chassisNumber || data?.vin || 'MAKGM668NP0192834',
-    engineNumber: data?.engineNumber || 'ENG-9988210',
-    variant: data?.variant || 'Standard',
-    year: data?.year || data?.modelYear || '2023',
+    modelYear: data?.modelYear || data?.year || '',
+    chassisNumber: data?.chassisNumber || data?.vin || '',
+    engineNumber: data?.engineNumber || '',
+    variant: data?.variant || '',
+    year: data?.year || data?.modelYear || '',
     type: data?.type || 'Petrol',
-    odometer: Number(data?.odometer) || 0,
-    fuelCapacity: Number(data?.fuelCapacity || data?.capacity) || (data?.type === 'EV' ? 82 : 45),
+    odometer: currentOdometer,
+    fuelCapacity: Number(data?.fuelCapacity || data?.capacity) || (data?.type?.includes('EV') ? 82 : 45),
     fuelLevel: Number(data?.fuelLevel) || 75,
-    vin: data?.vin || data?.chassisNumber || 'MAKGM668NP0192834',
-    regNumber: data?.regNumber || 'TS 09 FH 4821',
-    insuranceExpiry: data?.insuranceExpiry || '2026-11-20',
-    pucExpiry: data?.pucExpiry || '2026-10-15',
-    serviceDueKm: Number(data?.serviceDueKm) || 50000,
+    vin: data?.vin || data?.chassisNumber || '',
+    regNumber: data?.regNumber || '',
+    insuranceExpiry: data?.insuranceExpiry || '',
+    pucExpiry: data?.pucExpiry || '',
+    serviceDueKm: Number(data?.serviceDueKm) || (currentOdometer + 10000),
     healthScore: Number(data?.healthScore) || 94,
     healthStatus: data?.healthStatus || 'Good Condition',
     displayName,
     image: exactImage,
     imageUrl: exactImage,
     subsystems: data?.subsystems || {
-      engine: { name: data?.type === 'EV' ? 'Electric Drive Unit' : 'Engine / Powertrain', health: 92, status: 'Optimal' },
-      battery: { name: data?.type === 'EV' ? 'High-Voltage Battery' : '12V Starter Battery', health: 90, status: 'Good' },
+      engine: { name: data?.type?.includes('EV') ? 'Electric Drive Unit' : 'Engine / Powertrain', health: 92, status: 'Optimal' },
+      battery: { name: data?.type?.includes('EV') ? 'High-Voltage Battery' : '12V Starter Battery', health: 90, status: 'Good' },
       brakes: { name: 'Brake Pads & Rotors', health: 85, status: 'Within spec' },
       tyres: { name: 'Tyre Tread Life', health: 78, status: '32 PSI all round' },
       fluids: { name: 'Fluids & Coolants', health: 95, status: 'Levels normal' }

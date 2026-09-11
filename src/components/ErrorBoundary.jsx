@@ -78,17 +78,18 @@ export class ErrorBoundary extends React.Component {
               <button
                 onClick={this.handleReload}
                 style={{
-                  background: 'linear-gradient(135deg, #0066ff, #00d2ff)',
-                  color: 'white',
-                  border: 'none',
+                  background: '#F4EFE3',
+                  color: '#1F2937',
+                  border: '1px solid #D8D0C2',
                   borderRadius: '10px',
                   padding: '10px 20px',
                   fontSize: '14px',
-                  fontWeight: '600',
+                  fontWeight: '700',
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 <RefreshCw size={16} />
@@ -98,14 +99,15 @@ export class ErrorBoundary extends React.Component {
               <button
                 onClick={this.handleReset}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.06)',
-                  color: '#e2e8f0',
-                  border: '1px solid rgba(255, 255, 255, 0.12)',
+                  background: '#F4EFE3',
+                  color: '#1F2937',
+                  border: '1px solid #D8D0C2',
                   borderRadius: '10px',
                   padding: '10px 18px',
                   fontSize: '14px',
-                  fontWeight: '500',
-                  cursor: 'pointer'
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
                 <span>Reset Cache & Recover</span>

@@ -22,109 +22,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { getVehicleImage, buildVehicleObject, NEUTRAL_VEHICLE_FALLBACK } from '../services/VehicleService';
-
-export const PRESET_VEHICLES = [
-  {
-    id: 'honda-city',
-    name: 'Honda City',
-    manufacturer: 'Honda',
-    model: 'City',
-    modelYear: '2023',
-    variant: '1.5 i-VTEC V',
-    type: 'Petrol',
-    fuelCapacity: 40,
-    image: '/assets/vehicles/honda-city.jpg'
-  },
-  {
-    id: 'hyundai-creta',
-    name: 'Hyundai Creta',
-    manufacturer: 'Hyundai',
-    model: 'Creta',
-    modelYear: '2024',
-    variant: 'SX(O) Turbo',
-    type: 'Diesel',
-    fuelCapacity: 50,
-    image: '/assets/vehicles/hyundai-creta.jpg'
-  },
-  {
-    id: 'hyundai-venue',
-    name: 'Hyundai Venue',
-    manufacturer: 'Hyundai',
-    model: 'Venue',
-    modelYear: '2024',
-    variant: 'SX(O) 1.0 Turbo DCT',
-    type: 'Petrol',
-    fuelCapacity: 45,
-    image: '/assets/vehicles/hyundai-venue.jpg'
-  },
-  {
-    id: 'tata-nexon',
-    name: 'Tata Nexon',
-    manufacturer: 'Tata',
-    model: 'Nexon',
-    modelYear: '2024',
-    variant: 'Fearless+ DCA',
-    type: 'Petrol',
-    fuelCapacity: 44,
-    image: '/assets/vehicles/tata-nexon.jpg'
-  },
-  {
-    id: 'mahindra-xuv700',
-    name: 'Mahindra XUV700',
-    manufacturer: 'Mahindra',
-    model: 'XUV700',
-    modelYear: '2024',
-    variant: 'AX7 Luxury Pack',
-    type: 'Diesel',
-    fuelCapacity: 60,
-    image: '/assets/vehicles/mahindra-xuv700.png'
-  },
-  {
-    id: 'toyota-fortuner',
-    name: 'Toyota Fortuner',
-    manufacturer: 'Toyota',
-    model: 'Fortuner',
-    modelYear: '2024',
-    variant: '2.8 4x4 AT',
-    type: 'Diesel',
-    fuelCapacity: 80,
-    image: '/assets/vehicles/toyota-fortuner.jpg'
-  },
-  {
-    id: 'toyota-innova-hycross',
-    name: 'Toyota Innova HyCross',
-    manufacturer: 'Toyota',
-    model: 'Innova HyCross',
-    modelYear: '2024',
-    variant: 'ZX(O) Hybrid',
-    type: 'Strong Hybrid',
-    fuelCapacity: 52,
-    image: '/assets/vehicles/toyota-innova-hycross.jpg'
-  },
-  {
-    id: 'tesla-model-3',
-    name: 'Tesla Model 3',
-    manufacturer: 'Tesla',
-    model: 'Model 3',
-    modelYear: '2024',
-    variant: 'Long Range AWD',
-    type: 'Electric (EV)',
-    fuelCapacity: 82,
-    image: '/assets/vehicles/tesla-model-3.jpg'
-  },
-  {
-    id: 'tata-nexon-ev',
-    name: 'Tata Nexon EV',
-    manufacturer: 'Tata',
-    model: 'Nexon EV',
-    modelYear: '2024',
-    variant: 'Empowered+ LR',
-    type: 'Electric (EV)',
-    fuelCapacity: 82,
-    image: '/assets/vehicles/tata-nexon-ev.jpg'
-  }
-];
+import { getVehicleImage, buildVehicleObject, NEUTRAL_VEHICLE_FALLBACK, PRESET_VEHICLES } from '../services/VehicleService';
 
 const FUEL_TYPES = ['Petrol', 'Diesel', 'Electric (EV)', 'Strong Hybrid', 'CNG'];
 const YEARS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016'];
@@ -153,14 +51,14 @@ export function VehicleSetupView({ onVehicleSaved }) {
   const [formData, setFormData] = useState({
     manufacturer: '',
     model: '',
-    modelYear: '2024',
+    modelYear: '',
     variant: '',
-    type: 'Petrol',
+    type: '',
     regNumber: '',
     chassisNumber: '',
     engineNumber: '',
     odometer: '',
-    fuelCapacity: 45
+    fuelCapacity: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -195,15 +93,15 @@ export function VehicleSetupView({ onVehicleSaved }) {
       ...prev,
       manufacturer: preset.manufacturer,
       model: preset.model,
-      modelYear: preset.modelYear || '2024',
-      variant: preset.variant || '',
-      type: preset.type || 'Petrol',
+      modelYear: prev.modelYear || '',
+      variant: prev.variant || '',
+      type: prev.type || '',
       fuelCapacity: preset.fuelCapacity || 45
       // Crucially, personal details (regNumber, odometer, chassisNumber, engineNumber) remain unpopulated
     }));
     setErrorMessage('');
 
-    // Smoothly scroll down to Step 2 details on the same interface
+    // Smoothly scroll down to details section on the same interface
     setTimeout(() => {
       detailsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
@@ -217,8 +115,18 @@ export function VehicleSetupView({ onVehicleSaved }) {
     e.preventDefault();
 
     if (!formData.manufacturer.trim() || !formData.model.trim()) {
-      setErrorMessage('Please select a vehicle model from Step 1 above.');
+      setErrorMessage('Please select a vehicle model from Choose Your Vehicle above.');
       selectSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    if (!formData.modelYear) {
+      setErrorMessage('Please select a model year.');
+      return;
+    }
+
+    if (!formData.type) {
+      setErrorMessage('Please select a fuel type.');
       return;
     }
 
@@ -303,7 +211,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
       <section className="onboarding-welcome-hero">
         <div className="onboarding-hero-content">
           <div className="onboarding-brand-pill">
-            <span className="live-dot" style={{ background: 'var(--accent-blue)' }}></span>
+            <span className="live-dot" style={{ background: '#91AE6E' }}></span>
             <span>AUTO PULSE • CONNECTED VEHICLE PLATFORM</span>
           </div>
 
@@ -354,12 +262,12 @@ export function VehicleSetupView({ onVehicleSaved }) {
       </section>
 
       {/* ========================================================
-          2. STEP 1: CHOOSE YOUR VEHICLE
+          2. CHOOSE YOUR VEHICLE
           ======================================================== */}
       <section ref={selectSectionRef} className="onboarding-step-section" id="choose-vehicle-step">
         <div className="step-section-header">
           <div className="step-tag-pill">
-            <span>STEP 1</span>
+            <span>VEHICLE CATALOG</span>
           </div>
           <h2 className="step-title">Choose Your Vehicle</h2>
           <p className="step-subtitle">
@@ -459,12 +367,12 @@ export function VehicleSetupView({ onVehicleSaved }) {
       </section>
 
       {/* ========================================================
-          3. STEP 2: VEHICLE DETAILS & IDENTITY
+          3. VEHICLE DETAILS & IDENTITY
           ======================================================== */}
       <section ref={detailsSectionRef} className="onboarding-step-section" id="vehicle-details-step">
         <div className="step-section-header">
           <div className="step-tag-pill">
-            <span>STEP 2</span>
+            <span>SPECIFICATIONS & REGISTRATION</span>
           </div>
           <h2 className="step-title">Vehicle Details</h2>
           <p className="step-subtitle">
@@ -493,7 +401,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
           <div className="details-preview-panel">
             <div className="details-preview-header">
               <span className="preview-tag-title">Active Selection Preview</span>
-              <span className="live-dot" style={{ background: formData.manufacturer ? '#10b981' : 'var(--text-muted)' }}></span>
+              <span className="live-dot" style={{ background: formData.manufacturer ? '#91AE6E' : 'var(--text-muted)' }}></span>
             </div>
 
             <div className="details-preview-img-box">
@@ -506,7 +414,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
                 }}
               />
               <div className="details-preview-caption">
-                <strong>{formData.manufacturer ? `${formData.manufacturer} ${formData.model}` : 'Select a vehicle from Step 1'}</strong>
+                <strong>{formData.manufacturer ? `${formData.manufacturer} ${formData.model}` : 'Select a vehicle from catalog'}</strong>
                 <span>{formData.type || 'Powertrain'}</span>
               </div>
             </div>
@@ -521,7 +429,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
               <div className="spec-summary-item">
                 <span className="spec-label">Year & Powertrain:</span>
                 <strong className="spec-val">
-                  {formData.modelYear} • {formData.type}
+                  {formData.modelYear ? `${formData.modelYear} • ${formData.type || 'Standard'}` : 'Pending Selection'}
                 </strong>
               </div>
               <div className="spec-summary-item">
@@ -557,7 +465,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
                     type="text"
                     className="simple-input"
                     value={formData.manufacturer && formData.model ? `${formData.manufacturer} ${formData.model}` : ''}
-                    placeholder="Choose a vehicle model from Step 1 above"
+                    placeholder="Choose a vehicle model from catalog above"
                     readOnly
                     required
                     style={{ background: 'var(--surface-secondary)', fontWeight: '600' }}
@@ -575,6 +483,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
                     onChange={(e) => setFormData({ ...formData, modelYear: e.target.value })}
                     required
                   >
+                    <option value="">Select Year</option>
                     {YEARS.map(yr => (
                       <option key={yr} value={yr}>{yr}</option>
                     ))}
@@ -592,6 +501,7 @@ export function VehicleSetupView({ onVehicleSaved }) {
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                     required
                   >
+                    <option value="">Select Fuel Type</option>
                     {FUEL_TYPES.map(f => (
                       <option key={f} value={f}>{f}</option>
                     ))}
@@ -708,14 +618,14 @@ export function VehicleSetupView({ onVehicleSaved }) {
                     setFormData({
                       manufacturer: '',
                       model: '',
-                      modelYear: '2024',
+                      modelYear: '',
                       variant: '',
-                      type: 'Petrol',
+                      type: '',
                       regNumber: '',
                       chassisNumber: '',
                       engineNumber: '',
                       odometer: '',
-                      fuelCapacity: 45
+                      fuelCapacity: ''
                     });
                     setErrorMessage('');
                   }}

@@ -161,6 +161,14 @@ export function DashboardView() {
 
   return (
     <div className="dashboard-container">
+      {/* CINEMATIC AUTOMOTIVE AMBIENT BACKGROUND */}
+      <div className="dashboard-cinematic-bg" aria-hidden="true">
+        <div className="ambient-beam ambient-beam-1" />
+        <div className="ambient-beam ambient-beam-2" />
+        <div className="ambient-sweep" />
+        <div className="ambient-radial-glow" />
+      </div>
+
       {/* 1. GREETING & CONTEXT HEADER */}
       <section className="dashboard-intro">
         <div className="intro-left">
@@ -322,7 +330,7 @@ export function DashboardView() {
               <div>
                 <h3>{vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}</h3>
                 <p>
-                  {vehicle?.variant} &nbsp;•&nbsp; {vehicle?.year} &nbsp;•&nbsp; {vehicle?.type} &nbsp;•&nbsp; {vehicle?.regNumber}
+                  {[vehicle?.variant, vehicle?.year || vehicle?.modelYear, vehicle?.type, vehicle?.regNumber].filter(Boolean).join(' • ')}
                 </p>
               </div>
             </div>
@@ -330,11 +338,11 @@ export function DashboardView() {
             <div className="vehicle-stats-row">
               <div className="v-stat-box">
                 <span className="v-stat-sub">Distance Driven</span>
-                <strong>{vehicle?.odometer?.toLocaleString()} km</strong>
+                <strong>{vehicle?.odometer !== undefined ? `${vehicle.odometer.toLocaleString()} km` : '0 km'}</strong>
               </div>
               <div className="v-stat-box">
-                <span className="v-stat-sub">Fuel / Energy Tank</span>
-                <strong>{vehicle?.fuelLevel || 68}% ({vehicle?.type === 'EV' ? `${vehicle?.fuelCapacity} kWh` : `${vehicle?.fuelCapacity} L`})</strong>
+                <span className="v-stat-sub">{vehicle?.type?.includes('EV') ? 'Battery Charge' : 'Fuel Level'}</span>
+                <strong>{vehicle?.fuelLevel || 75}% ({vehicle?.type?.includes('EV') ? `${vehicle?.fuelCapacity || 82} kWh` : `${vehicle?.fuelCapacity || 45} L`})</strong>
               </div>
               <div className="v-stat-box">
                 <span className="v-stat-sub">System Status</span>
@@ -348,7 +356,7 @@ export function DashboardView() {
 
           <div className="car-backdrop-visual">
             <img
-              src={getVehicleImage(vehicle) || NEUTRAL_VEHICLE_FALLBACK}
+              src={getVehicleImage(vehicle) || vehicle?.imageUrl || NEUTRAL_VEHICLE_FALLBACK}
               alt={`${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''}`}
               loading="lazy"
               onError={(e) => {
@@ -388,20 +396,22 @@ export function DashboardView() {
           </div>
 
           <div className="service-main-content">
-            <h2>50,000 km Major Service</h2>
+            <h2>{vehicle?.serviceDueKm ? `${vehicle.serviceDueKm.toLocaleString()} km Periodic Service` : 'Periodic Milestone Service'}</h2>
             <p className="service-target-km">
-              Scheduled at {vehicle?.serviceDueKm ? vehicle.serviceDueKm.toLocaleString() : '50,000'} km
+              Scheduled at {vehicle?.serviceDueKm ? vehicle.serviceDueKm.toLocaleString() : 'Upcoming'} km
             </p>
 
             <div className="service-progress-wrap">
               <div className="progress-text-row">
                 <strong>
-                  {vehicle ? (vehicle.serviceDueKm - vehicle.odometer).toLocaleString() : '7,320'} km
+                  {vehicle && vehicle.serviceDueKm > vehicle.odometer 
+                    ? (vehicle.serviceDueKm - vehicle.odometer).toLocaleString() 
+                    : '5,000'} km
                 </strong>
-                <span>remaining (85% interval completed)</span>
+                <span>remaining (Interval check active)</span>
               </div>
               <div className="progress-bar">
-                <div className="progress-bar-fill" style={{ width: '85%' }}></div>
+                <div className="progress-bar-fill" style={{ width: '82%' }}></div>
               </div>
             </div>
 
@@ -414,7 +424,11 @@ export function DashboardView() {
             </div>
 
             <div className="service-checklist-preview">
-              <span>Includes: Synthetic Oil • Air Filter • Spark Plugs • Brake Inspection</span>
+              <span>
+                {vehicle?.type?.includes('EV')
+                  ? 'Includes: High-Voltage Diagnostics • Brake Fluid • Cabin Air Filter • Tire Rotation'
+                  : 'Includes: Synthetic Engine Oil • Oil Filter • Air Filter • Multi-Point Inspection'}
+              </span>
             </div>
 
             <button 
@@ -674,7 +688,7 @@ export function DashboardView() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <small className="subsystem-stat-label">{item.status}</small>
-                      <small style={{ fontSize: '10px', color: 'var(--accent-blue)', opacity: 0.85 }}>Details →</small>
+                      <small style={{ fontSize: '10px', color: '#91AE6E', opacity: 0.95, fontWeight: '600' }}>Details →</small>
                     </div>
                   </div>
                 );

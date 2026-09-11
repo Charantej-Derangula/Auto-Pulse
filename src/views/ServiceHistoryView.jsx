@@ -65,7 +65,7 @@ export function ServiceHistoryView() {
         <div>
           <h2>Service History & Invoices</h2>
           <p>
-            Complete historical log of garage visits, scheduled appointments, and verified parts for {vehicle?.displayName || `${vehicle?.manufacturer || 'Honda'} ${vehicle?.model || 'City'}`}.
+            Complete historical log of garage visits, scheduled appointments, and verified parts for {vehicle?.displayName || (vehicle ? `${vehicle.manufacturer} ${vehicle.model}` : 'your vehicle')}.
           </p>
         </div>
 
@@ -144,10 +144,10 @@ export function ServiceHistoryView() {
                           fontSize: '11px', 
                           padding: '2px 8px', 
                           borderRadius: '4px', 
-                          background: 'rgba(56, 168, 255, 0.15)', 
-                          color: 'var(--accent-blue)', 
+                          background: 'rgba(145, 174, 110, 0.15)', 
+                          color: '#1F2937', 
                           fontWeight: '700',
-                          border: '1px solid rgba(56, 168, 255, 0.3)'
+                          border: '1px solid #91AE6E'
                         }}
                       >
                         Scheduled

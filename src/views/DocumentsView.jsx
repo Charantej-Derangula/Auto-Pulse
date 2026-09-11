@@ -158,7 +158,7 @@ export function DocumentsView() {
           <h2>Digital Document Vault</h2>
           <p>
             Secure encrypted storage for Registration, Insurance, PUC, and Driver compliance certificates 
-            for <strong style={{ color: 'var(--accent-blue)' }}>{vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}</strong>.
+            for <strong style={{ color: '#91AE6E' }}>{vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}</strong>.
           </p>
         </div>
 
@@ -383,7 +383,7 @@ export function DocumentsView() {
                 <div className="sheet-body">
                   <div className="sheet-row">
                     <span>Vehicle:</span>
-                    <strong>{vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`} ({vehicle?.regNumber || 'TS 09 FH 4821'})</strong>
+                    <strong>{vehicle?.displayName || (vehicle ? `${vehicle.manufacturer} ${vehicle.model}` : 'Vehicle')}{vehicle?.regNumber ? ` (${vehicle.regNumber})` : ''}</strong>
                   </div>
                   <div className="sheet-row">
                     <span>Document Type:</span>

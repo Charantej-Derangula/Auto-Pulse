@@ -105,7 +105,7 @@ export function RemindersView() {
       category: formData.category,
       priority: formData.priority,
       vehicleId: currentVehicleId,
-      vehicle: `${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''} (${vehicle?.regNumber || 'TS 09 FH 4821'})`,
+      vehicle: vehicle ? `${vehicle.manufacturer || 'Vehicle'} ${vehicle.model || ''}${vehicle.regNumber ? ` (${vehicle.regNumber})` : ''}`.trim() : 'Active Vehicle',
       notes: formData.notes.trim()
     });
 
@@ -130,7 +130,7 @@ export function RemindersView() {
           <h2>Vehicle Reminders & Alerts</h2>
           <p>
             Track milestone inspections, PUC renewals, and policy expirations for{' '}
-            <strong style={{ color: 'var(--accent-blue)' }}>
+            <strong style={{ color: '#91AE6E' }}>
               {vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}
             </strong>.
           </p>

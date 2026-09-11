@@ -158,11 +158,11 @@ export function DiagnoseIssueView() {
               width: '44px',
               height: '44px',
               borderRadius: '12px',
-              background: 'rgba(56, 168, 255, 0.12)',
-              border: '1px solid rgba(56, 168, 255, 0.25)',
+              background: 'rgba(145, 174, 110, 0.15)',
+              border: '1px solid #91AE6E',
               display: 'grid',
               placeItems: 'center',
-              color: 'var(--accent-blue)',
+              color: '#1F2937',
               flexShrink: 0
             }}>
               <Car size={24} />
@@ -170,7 +170,7 @@ export function DiagnoseIssueView() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h3 style={{ fontSize: '17px', fontWeight: '800', margin: 0 }}>
-                  {vehicle?.displayName || `${vehicle?.manufacturer || 'Honda'} ${vehicle?.model || 'City'}`}
+                  {vehicle?.displayName || (vehicle ? `${vehicle.manufacturer} ${vehicle.model}` : 'Active Diagnostic Profile')}
                 </h3>
                 {vehicle?.variant && (
                   <span className="badge-good" style={{ fontSize: '11px', padding: '2px 8px' }}>
@@ -179,7 +179,7 @@ export function DiagnoseIssueView() {
                 )}
               </div>
               <p style={{ fontSize: '12px', color: 'var(--text-dim)', margin: '3px 0 0' }}>
-                Active diagnosis profile for {vehicle?.regNumber || 'TS 09 FH 4821'}
+                {vehicle?.regNumber ? `Active diagnosis profile for ${vehicle.regNumber}` : 'Active vehicle diagnostic telemetry connected'}
               </p>
             </div>
           </div>
@@ -269,15 +269,15 @@ export function DiagnoseIssueView() {
                         onClick={() => handleToggleChip(chip)}
                         disabled={isAnalyzing}
                         style={{
-                          background: isSelected ? 'rgba(56, 168, 255, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                          border: isSelected ? '1px solid var(--accent-blue)' : '1px solid var(--card-border)',
-                          color: isSelected ? 'var(--accent-blue)' : 'var(--text-muted)',
+                          background: isSelected ? '#91AE6E' : '#F4EFE3',
+                          border: isSelected ? '1px solid #91AE6E' : '1px solid #D8D0C2',
+                          color: isSelected ? '#FFFFFF' : '#1F2937',
                           padding: '6px 12px',
                           borderRadius: '20px',
                           fontSize: '12px',
                           cursor: 'pointer',
                           transition: 'all 0.2s ease',
-                          fontWeight: isSelected ? '600' : '400'
+                          fontWeight: isSelected ? '600' : '500'
                         }}
                       >
                         {isSelected ? '✓ ' : '+ '}{chip}
@@ -414,7 +414,7 @@ export function DiagnoseIssueView() {
                   <div>
                     <p style={{ margin: 0, fontWeight: '600' }}>{currentDiagnosis.recommendedAction}</p>
                     {currentDiagnosis.suggestedService && (
-                      <p style={{ margin: '6px 0 0', fontSize: '13px', color: 'var(--accent-blue)' }}>
+                      <p style={{ margin: '6px 0 0', fontSize: '13px', color: '#91AE6E' }}>
                         Suggested Service: <strong>{currentDiagnosis.suggestedService}</strong>
                       </p>
                     )}
@@ -427,7 +427,7 @@ export function DiagnoseIssueView() {
                 <span>Reported: "{currentDiagnosis.reportedSymptoms}"</span>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <span>Confidence: <strong style={{ color: 'var(--text-main)' }}>{currentDiagnosis.confidence}</strong></span>
-                  <span>Diagnostic Code: <strong style={{ color: 'var(--accent-blue)' }}>{currentDiagnosis.dtcCode}</strong></span>
+                  <span>Diagnostic Code: <strong style={{ color: '#91AE6E' }}>{currentDiagnosis.dtcCode}</strong></span>
                 </div>
               </div>
             </div>
@@ -524,8 +524,8 @@ export function DiagnoseIssueView() {
                     style={{
                       padding: '10px 12px',
                       borderRadius: '8px',
-                      background: currentDiagnosis?.id === item.id ? 'rgba(56, 168, 255, 0.1)' : 'rgba(255, 255, 255, 0.02)',
-                      border: currentDiagnosis?.id === item.id ? '1px solid var(--accent-blue)' : '1px solid var(--card-border)',
+                      background: currentDiagnosis?.id === item.id ? 'rgba(145, 174, 110, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+                      border: currentDiagnosis?.id === item.id ? '1px solid #91AE6E' : '1px solid var(--card-border)',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease'
                     }}

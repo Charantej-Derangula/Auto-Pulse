@@ -114,10 +114,10 @@ export function Sidebar() {
             <span className="vehicle-mini-sub">{vehicle.odometer ? `${vehicle.odometer.toLocaleString()} km • ` : ''}{vehicle.healthScore || 95}% Health</span>
           </div>
         ) : (
-          <div className="sidebar-vehicle-pill" onClick={() => handleNavigation('/dashboard', 'Dashboard')} style={{ borderColor: 'var(--accent-blue)', background: 'rgba(23, 105, 224, 0.05)' }}>
+          <div className="sidebar-vehicle-pill" onClick={() => handleNavigation('/dashboard', 'Dashboard')} style={{ borderColor: '#91AE6E', background: 'rgba(145, 174, 110, 0.12)' }}>
             <div className="vehicle-mini-status">
-              <span className="pulse-dot" style={{ background: 'var(--accent-blue)' }}></span>
-              <strong style={{ color: 'var(--accent-blue)' }}>+ Add Your Vehicle</strong>
+              <span className="pulse-dot" style={{ background: '#91AE6E' }}></span>
+              <strong style={{ color: '#1F2937' }}>+ Add Your Vehicle</strong>
             </div>
             <span className="vehicle-mini-sub">Setup garage profile</span>
           </div>

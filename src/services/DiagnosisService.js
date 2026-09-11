@@ -357,8 +357,8 @@ export async function analyzeVehicleIssue({ system = 'Engine', symptoms = '', ve
       hour: '2-digit',
       minute: '2-digit'
     }),
-    vehicleName: vehicle?.displayName || `${vehicle?.manufacturer || 'Honda'} ${vehicle?.model || 'City'}`,
-    vehicleId: vehicle?.id || 'default-vehicle',
+    vehicleName: vehicle?.displayName || (vehicle ? `${vehicle.manufacturer || ''} ${vehicle.model || ''}`.trim() : 'Active Vehicle'),
+    vehicleId: vehicle?.id || vehicle?.vehicleId || 'active-vehicle',
     system: cleanSystem,
     reportedSymptoms: symptoms,
     title: matchedRule.diagnosis,

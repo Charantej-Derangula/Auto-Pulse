@@ -86,12 +86,24 @@ export function MyVehicleView() {
 
         <div className="flex-center-gap">
           <button 
+            className="outline-button flex-center-gap change-vehicle-btn"
+            style={{ width: 'auto', padding: '10px 18px' }}
+            onClick={() => {
+              navigate('/vehicle-setup');
+              if (setActiveTab) setActiveTab('My Vehicle');
+            }}
+          >
+            <RefreshCw size={16} />
+            <span>Change Vehicle</span>
+          </button>
+
+          <button 
             className="outline-button flex-center-gap"
             style={{ width: 'auto', padding: '10px 18px' }}
             onClick={() => setIsEditing(!isEditing)}
           >
             <Edit3 size={16} />
-            <span>{isEditing ? 'Cancel Edit' : 'Edit Vehicle Info'}</span>
+            <span>{isEditing ? 'Cancel Edit' : 'Edit Specs'}</span>
           </button>
         </div>
       </div>
@@ -202,18 +214,20 @@ export function MyVehicleView() {
               <label>Registration Number</label>
               <input 
                 name="regNumber" 
-                value={formData.regNumber || 'TS 09 FH 4821'} 
+                value={formData.regNumber || ''} 
                 onChange={handleChange} 
                 className="simple-input" 
+                placeholder="Enter registration number"
               />
             </div>
             <div className="form-group">
               <label>VIN / Chassis Number</label>
               <input 
                 name="vin" 
-                value={formData.vin || 'MAKGM668NP0192834'} 
+                value={formData.vin || ''} 
                 onChange={handleChange} 
                 className="simple-input" 
+                placeholder="Enter chassis/VIN number"
               />
             </div>
 
@@ -291,7 +305,7 @@ export function MyVehicleView() {
               <ShieldCheck size={16} />
               <div>
                 <small>Registration</small>
-                <strong>{vehicle?.regNumber || 'TS 09 FH 4821'}</strong>
+                <strong>{vehicle?.regNumber || 'Unregistered'}</strong>
               </div>
             </div>
 
@@ -374,7 +388,7 @@ export function MyVehicleView() {
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <small className="text-muted" style={{ fontSize: "11px" }}>{sub.status}</small>
-                    <small style={{ fontSize: "10px", color: "var(--accent-blue)", opacity: 0.85 }}>View Details →</small>
+                    <small style={{ fontSize: "10px", color: "#91AE6E", opacity: 0.95, fontWeight: "600" }}>View Details →</small>
                   </div>
                 </div>
               );
@@ -441,23 +455,37 @@ export function MyVehicleView() {
           <div className="tech-specs-table">
             <div className="spec-table-row">
               <span>VIN / Chassis</span>
-              <strong>{vehicle?.vin || 'MAKGM668NP0192834'}</strong>
+              <strong>{vehicle?.vin || vehicle?.chassisNumber || 'OEM Verified'}</strong>
             </div>
             <div className="spec-table-row">
               <span>Engine / Powertrain</span>
-              <strong>{vehicle?.type === 'EV' ? 'Permanent Magnet AC Sync' : '1.5L i-VTEC DOHC 4-Cylinder'}</strong>
+              <strong>
+                {vehicle?.type?.includes('EV') 
+                  ? 'Permanent Magnet Synchronous Drive' 
+                  : (vehicle?.engineNumber ? `OEM Specification (${vehicle.engineNumber})` : `${vehicle?.manufacturer || 'OEM'} Powertrain`)}
+              </strong>
             </div>
             <div className="spec-table-row">
               <span>Transmission</span>
-              <strong>{vehicle?.type === 'EV' ? 'Single Speed Direct' : '7-Speed CVT with Paddle Shift'}</strong>
+              <strong>
+                {vehicle?.type?.includes('EV') 
+                  ? 'Single Speed Direct Drive' 
+                  : (vehicle?.variant?.toLowerCase().includes('cvt') 
+                    ? 'CVT Automatic' 
+                    : vehicle?.variant?.toLowerCase().includes('dct') || vehicle?.variant?.toLowerCase().includes('dca') 
+                      ? 'Dual Clutch Transmission' 
+                      : vehicle?.variant?.toLowerCase().includes('at') 
+                        ? 'Torque Converter AT' 
+                        : 'Multi-Speed Manual / Auto')}
+              </strong>
             </div>
             <div className="spec-table-row">
               <span>Emission Norms</span>
-              <strong>BS-VI Phase 2 (RDE Compliant)</strong>
+              <strong>{vehicle?.type?.includes('EV') ? 'Zero Emission Vehicle (ZEV)' : 'BS-VI Phase 2 (RDE Compliant)'}</strong>
             </div>
             <div className="spec-table-row">
               <span>Tyre Dimension</span>
-              <strong>185/55 R16 83H Tubeless</strong>
+              <strong>{vehicle?.type?.includes('EV') ? 'Low Rolling Resistance Radial' : 'OEM Certified All-Season Radial'}</strong>
             </div>
           </div>
         </div>

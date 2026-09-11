@@ -680,16 +680,16 @@ export function ServiceMaintenanceView() {
                       marginTop: '14px', 
                       padding: '10px 14px', 
                       borderRadius: '8px', 
-                      background: 'rgba(56, 168, 255, 0.12)', 
-                      border: '1px solid rgba(56, 168, 255, 0.3)', 
+                      background: 'rgba(145, 174, 110, 0.15)', 
+                      border: '1px solid #91AE6E', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'space-between' 
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <CheckCircle2 size={16} className="text-blue" />
-                      <strong style={{ fontSize: '13px', color: 'var(--accent-blue)' }}>
+                      <CheckCircle2 size={16} style={{ color: '#91AE6E' }} />
+                      <strong style={{ fontSize: '13px', color: '#1F2937' }}>
                         ✓ 50,000 km Service Booked
                       </strong>
                     </div>
@@ -730,16 +730,16 @@ export function ServiceMaintenanceView() {
                       marginTop: '14px', 
                       padding: '8px 12px', 
                       borderRadius: '8px', 
-                      background: 'rgba(56, 168, 255, 0.12)', 
-                      border: '1px solid rgba(56, 168, 255, 0.3)', 
+                      background: 'rgba(145, 174, 110, 0.15)', 
+                      border: '1px solid #91AE6E', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'space-between' 
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <CheckCircle2 size={14} className="text-blue" />
-                      <strong style={{ fontSize: '12px', color: 'var(--accent-blue)' }}>
+                      <CheckCircle2 size={14} style={{ color: '#91AE6E' }} />
+                      <strong style={{ fontSize: '12px', color: '#1F2937' }}>
                         ✓ 60,000 km Service Booked
                       </strong>
                     </div>
@@ -926,10 +926,10 @@ export function ServiceMaintenanceView() {
                               fontSize: '11px', 
                               padding: '2px 8px', 
                               borderRadius: '4px', 
-                              background: 'rgba(56, 168, 255, 0.15)', 
-                              color: 'var(--accent-blue)', 
+                              background: 'rgba(145, 174, 110, 0.15)', 
+                              color: '#1F2937', 
                               fontWeight: '700',
-                              border: '1px solid rgba(56, 168, 255, 0.3)'
+                              border: '1px solid #91AE6E'
                             }}
                           >
                             Scheduled
