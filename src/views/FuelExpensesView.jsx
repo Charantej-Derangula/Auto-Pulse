@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Fuel,
   Plus,
@@ -28,23 +28,34 @@ export function FuelExpensesView() {
     fullTank: true
   });
 
-  const totalSpend = fuelLogs.reduce((acc, log) => acc + log.cost, 0);
-  const totalLitres = fuelLogs.reduce((acc, log) => acc + log.litres, 0);
-  const avgEfficiency = (fuelLogs.reduce((acc, log) => acc + log.efficiency, 0) / fuelLogs.length).toFixed(1);
-  const costPerKm = (totalSpend / fuelLogs.reduce((acc, log) => acc + log.tripDistance, 0)).toFixed(2);
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+
+  // Filter fuel logs strictly for currently active vehicle
+  const vehicleFuelLogs = useMemo(() => {
+    const raw = Array.isArray(fuelLogs) ? fuelLogs : [];
+    return raw.filter(log => (log.vehicleId === currentVehicleId || !log.vehicleId));
+  }, [fuelLogs, currentVehicleId]);
+
+  const totalSpend = vehicleFuelLogs.reduce((acc, log) => acc + (Number(log.cost) || 0), 0);
+  const totalLitres = vehicleFuelLogs.reduce((acc, log) => acc + (Number(log.litres) || 0), 0);
+  const totalTripDist = vehicleFuelLogs.reduce((acc, log) => acc + (Number(log.tripDistance) || 0), 0);
+  const avgEfficiency = vehicleFuelLogs.length > 0 ? (vehicleFuelLogs.reduce((acc, log) => acc + (Number(log.efficiency) || 0), 0) / vehicleFuelLogs.length).toFixed(1) : '0.0';
+  const costPerKm = totalTripDist > 0 ? (totalSpend / totalTripDist).toFixed(2) : '0.00';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const litresNum = parseFloat(formData.litres);
-    const costNum = parseFloat(formData.cost);
-    const tripNum = parseFloat(formData.tripDistance);
-    const odoNum = parseInt(formData.odometer);
+    const litresNum = parseFloat(formData.litres) || 0;
+    const costNum = parseFloat(formData.cost) || 0;
+    const tripNum = parseFloat(formData.tripDistance) || 0;
+    const odoNum = parseInt(formData.odometer) || (vehicle?.odometer || 0);
 
-    const calculatedEfficiency = parseFloat((tripNum / litresNum).toFixed(2));
-    const pricePerLitre = parseFloat((costNum / litresNum).toFixed(1));
+    const calculatedEfficiency = litresNum > 0 ? parseFloat((tripNum / litresNum).toFixed(2)) : 0;
+    const pricePerLitre = litresNum > 0 ? parseFloat((costNum / litresNum).toFixed(1)) : 0;
 
     const newLog = {
       id: 'fuel-' + Date.now(),
+      vehicleId: currentVehicleId,
+      vehicleName: vehicle?.displayName || 'Honda City',
       date: formData.date,
       station: formData.station,
       litres: litresNum,
@@ -128,7 +139,7 @@ export function FuelExpensesView() {
       <div className="panel" style={{ marginTop: '24px' }}>
         <div className="section-header">
           <h3>Refuel & Charging History</h3>
-          <span className="text-muted">{fuelLogs.length} transactions recorded</span>
+          <span className="text-muted">{vehicleFuelLogs.length} transactions for {vehicle?.displayName || 'Honda City'}</span>
         </div>
 
         <div className="table-responsive-wrapper">
@@ -145,7 +156,7 @@ export function FuelExpensesView() {
               </tr>
             </thead>
             <tbody>
-              {fuelLogs.map((log) => (
+              {vehicleFuelLogs.map((log) => (
                 <tr key={log.id}>
                   <td><strong>{log.date}</strong></td>
                   <td>
@@ -155,7 +166,7 @@ export function FuelExpensesView() {
                     </div>
                   </td>
                   <td>{log.litres} {vehicle?.type === 'EV' ? 'kWh' : 'L'}</td>
-                  <td><strong className="text-emerald">₹{log.cost.toLocaleString()}</strong></td>
+                  <td><strong className="text-emerald">₹{Number(log.cost).toLocaleString()}</strong></td>
                   <td>{log.tripDistance} km</td>
                   <td>
                     <span className="efficiency-badge">
@@ -165,6 +176,13 @@ export function FuelExpensesView() {
                   <td>{log.odometer?.toLocaleString()} km</td>
                 </tr>
               ))}
+              {vehicleFuelLogs.length === 0 && (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-dim)' }}>
+                    No fuel / energy logs recorded for this vehicle yet.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

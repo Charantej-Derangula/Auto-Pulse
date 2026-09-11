@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Bell,
   Plus,
@@ -8,43 +8,115 @@ import {
   AlertTriangle,
   Clock,
   Car,
-  Filter
+  Filter,
+  Check,
+  AlertCircle,
+  Sparkles,
+  Info,
+  X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { 
+  REMINDER_CATEGORIES, 
+  REMINDER_PRIORITIES, 
+  calculateReminderStatus, 
+  normalizeReminder 
+} from '../services/DocumentService';
 
 export function RemindersView() {
   const { reminders, toggleReminder, addReminder, deleteReminder, vehicle } = useApp();
-  const [filter, setFilter] = useState('all'); // all, upcoming, completed
+  const [filter, setFilter] = useState('all'); // all, upcoming, due-soon, overdue, completed
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [successToast, setSuccessToast] = useState(null);
+
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+
   const [formData, setFormData] = useState({
     title: '',
     dueDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-    category: 'Maintenance',
+    category: 'Vehicle service',
     priority: 'High',
     notes: ''
   });
 
-  const filteredReminders = reminders.filter(r => {
-    if (filter === 'upcoming') return !r.completed;
-    if (filter === 'completed') return r.completed;
-    return true;
-  });
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // 1. Filter reminders by current vehicle and normalize status
+  const vehicleReminders = useMemo(() => {
+    const rawList = Array.isArray(reminders) ? reminders : [];
+    return rawList
+      .map(rem => normalizeReminder(rem, currentVehicleId))
+      .filter(Boolean)
+      .filter(rem => rem.vehicleId === currentVehicleId);
+  }, [reminders, currentVehicleId]);
+
+  // 2. Metrics summary
+  const reminderStats = useMemo(() => {
+    let upcomingCount = 0;
+    let dueSoonCount = 0;
+    let overdueCount = 0;
+    let completedCount = 0;
+
+    vehicleReminders.forEach(r => {
+      const statusInfo = calculateReminderStatus(r);
+      if (r.completed || statusInfo.status === 'Completed') completedCount++;
+      else if (statusInfo.status === 'Overdue') overdueCount++;
+      else if (statusInfo.status === 'Due Soon') dueSoonCount++;
+      else upcomingCount++;
+    });
+
+    return {
+      total: vehicleReminders.length,
+      upcomingCount,
+      dueSoonCount,
+      overdueCount,
+      completedCount
+    };
+  }, [vehicleReminders]);
+
+  // 3. Filtered reminders
+  const filteredReminders = useMemo(() => {
+    return vehicleReminders.filter(rem => {
+      const statusInfo = calculateReminderStatus(rem);
+      if (filter === 'upcoming') return !rem.completed && statusInfo.status === 'Upcoming';
+      if (filter === 'due-soon') return !rem.completed && statusInfo.status === 'Due Soon';
+      if (filter === 'overdue') return !rem.completed && statusInfo.status === 'Overdue';
+      if (filter === 'completed') return rem.completed;
+      return true;
+    });
+  }, [vehicleReminders, filter]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    const reminderTitle = formData.title.trim() || formData.category;
+
     addReminder({
-      title: formData.title,
+      title: reminderTitle,
       dueDate: formData.dueDate,
       category: formData.category,
       priority: formData.priority,
-      vehicle: `${vehicle?.manufacturer} ${vehicle?.model} (${vehicle?.regNumber || 'TS 09 FH 4821'})`,
-      notes: formData.notes
+      vehicleId: currentVehicleId,
+      vehicle: `${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''} (${vehicle?.regNumber || 'TS 09 FH 4821'})`,
+      notes: formData.notes.trim()
     });
+
     setIsModalOpen(false);
+    setSuccessToast(`Reminder "${reminderTitle}" created for ${vehicle?.displayName || vehicle?.model || 'vehicle'}!`);
+    setTimeout(() => setSuccessToast(null), 4000);
+
     setFormData({
       title: '',
       dueDate: new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0],
-      category: 'Maintenance',
+      category: 'Vehicle service',
       priority: 'High',
       notes: ''
     });
@@ -56,7 +128,12 @@ export function RemindersView() {
       <div className="page-header-row">
         <div>
           <h2>Vehicle Reminders & Alerts</h2>
-          <p>Never miss critical maintenance milestones, insurance renewals, or PUC inspections.</p>
+          <p>
+            Track milestone inspections, PUC renewals, and policy expirations for{' '}
+            <strong style={{ color: 'var(--accent-blue)' }}>
+              {vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}
+            </strong>.
+          </p>
         </div>
 
         <button 
@@ -65,121 +142,246 @@ export function RemindersView() {
           onClick={() => setIsModalOpen(true)}
         >
           <Plus size={16} />
-          <span>Add New Reminder</span>
+          <span>Add Reminder</span>
         </button>
       </div>
 
-      {/* FILTER BUTTONS */}
+      {/* SUCCESS TOAST */}
+      {successToast && (
+        <div className="alert-banner-success flex-center-gap" style={{ animation: 'fadeIn 0.2s ease-out' }}>
+          <CheckCircle2 size={18} />
+          <span>{successToast}</span>
+        </div>
+      )}
+
+      {/* KPI METRIC CARDS */}
+      <div className="kpi-grid" style={{ gridTemplateColumns: 'repeat(4, minmax(0, 1fr))' }}>
+        <div className="kpi-card" style={{ padding: '14px 18px' }}>
+          <div className="kpi-top">
+            <span className="kpi-label">Upcoming Scheduled</span>
+            <div className="kpi-icon-wrap blue" style={{ width: '32px', height: '32px' }}>
+              <Calendar size={16} />
+            </div>
+          </div>
+          <div className="kpi-val-row" style={{ margin: '6px 0 0' }}>
+            <strong className="kpi-value">{reminderStats.upcomingCount}</strong>
+            <span className="kpi-unit">on track</span>
+          </div>
+        </div>
+
+        <div className="kpi-card" style={{ padding: '14px 18px' }}>
+          <div className="kpi-top">
+            <span className="kpi-label">Due Soon (≤ 7 Days)</span>
+            <div className="kpi-icon-wrap amber" style={{ width: '32px', height: '32px' }}>
+              <Clock size={16} />
+            </div>
+          </div>
+          <div className="kpi-val-row" style={{ margin: '6px 0 0' }}>
+            <strong className="kpi-value" style={{ color: 'var(--accent-amber)' }}>{reminderStats.dueSoonCount}</strong>
+            <span className="kpi-unit">action needed</span>
+          </div>
+        </div>
+
+        <div className="kpi-card" style={{ padding: '14px 18px' }}>
+          <div className="kpi-top">
+            <span className="kpi-label">Overdue</span>
+            <div className="kpi-icon-wrap" style={{ width: '32px', height: '32px', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+              <AlertTriangle size={16} />
+            </div>
+          </div>
+          <div className="kpi-val-row" style={{ margin: '6px 0 0' }}>
+            <strong className="kpi-value" style={{ color: reminderStats.overdueCount > 0 ? '#fca5a5' : 'var(--text-muted)' }}>
+              {reminderStats.overdueCount}
+            </strong>
+            <span className="kpi-unit">urgent</span>
+          </div>
+        </div>
+
+        <div className="kpi-card" style={{ padding: '14px 18px' }}>
+          <div className="kpi-top">
+            <span className="kpi-label">Completed</span>
+            <div className="kpi-icon-wrap green" style={{ width: '32px', height: '32px' }}>
+              <CheckCircle2 size={16} />
+            </div>
+          </div>
+          <div className="kpi-val-row" style={{ margin: '6px 0 0' }}>
+            <strong className="kpi-value" style={{ color: 'var(--accent-emerald)' }}>{reminderStats.completedCount}</strong>
+            <span className="kpi-unit">done</span>
+          </div>
+        </div>
+      </div>
+
+      {/* FILTER PILLS */}
       <div className="reminders-filter-row">
         <div className="filter-pill-group">
           <button 
             className={`filter-pill ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
-            All Reminders ({reminders.length})
+            All Reminders ({reminderStats.total})
           </button>
           <button 
             className={`filter-pill ${filter === 'upcoming' ? 'active' : ''}`}
             onClick={() => setFilter('upcoming')}
           >
-            Pending / Active ({reminders.filter(r => !r.completed).length})
+            Upcoming ({reminderStats.upcomingCount})
+          </button>
+          <button 
+            className={`filter-pill ${filter === 'due-soon' ? 'active' : ''}`}
+            onClick={() => setFilter('due-soon')}
+          >
+            Due Soon ({reminderStats.dueSoonCount})
+          </button>
+          <button 
+            className={`filter-pill ${filter === 'overdue' ? 'active' : ''}`}
+            onClick={() => setFilter('overdue')}
+          >
+            Overdue ({reminderStats.overdueCount})
           </button>
           <button 
             className={`filter-pill ${filter === 'completed' ? 'active' : ''}`}
             onClick={() => setFilter('completed')}
           >
-            Completed ({reminders.filter(r => r.completed).length})
+            Completed ({reminderStats.completedCount})
           </button>
         </div>
       </div>
 
       {/* REMINDERS LIST */}
       <div className="reminders-cards-list">
-        {filteredReminders.map((rem) => (
-          <div key={rem.id} className={`reminder-card ${rem.completed ? 'completed' : ''}`}>
-            <div className="rem-checkbox-col">
-              <button 
-                className={`rem-check-btn ${rem.completed ? 'checked' : ''}`}
-                onClick={() => toggleReminder(rem.id)}
-                title={rem.completed ? "Mark pending" : "Mark completed"}
-              >
-                {rem.completed && <CheckCircle2 size={20} />}
-              </button>
-            </div>
-
-            <div className="rem-content-col">
-              <div className="rem-header-row">
-                <strong className={`rem-title ${rem.completed ? 'strike' : ''}`}>{rem.title}</strong>
-                <div className="flex-center-gap">
-                  <span className={`priority-tag ${rem.priority.toLowerCase()}`}>
-                    {rem.priority} Priority
-                  </span>
-                  <span className="rem-cat-tag">{rem.category}</span>
-                </div>
+        {filteredReminders.map((rem) => {
+          const statusInfo = calculateReminderStatus(rem);
+          return (
+            <div key={rem.id} className={`reminder-card ${rem.completed ? 'completed' : ''}`}>
+              <div className="rem-checkbox-col">
+                <button 
+                  className={`rem-check-btn ${rem.completed ? 'checked' : ''}`}
+                  onClick={() => toggleReminder(rem.id)}
+                  title={rem.completed ? "Mark as pending" : "Mark as completed"}
+                >
+                  {rem.completed && <CheckCircle2 size={20} />}
+                </button>
               </div>
 
-              <div className="rem-meta-row">
-                <div className="flex-center-gap text-muted">
-                  <Calendar size={14} />
-                  <span>Target Due: <strong>{rem.dueDate}</strong></span>
+              <div className="rem-content-col">
+                <div className="rem-header-row">
+                  <strong className={`rem-title ${rem.completed ? 'strike' : ''}`}>{rem.title}</strong>
+                  <div className="flex-center-gap">
+                    {/* Status badge */}
+                    <span 
+                      className={`doc-status-badge ${statusInfo.statusType}`}
+                      style={{ fontSize: '11px', padding: '2px 8px' }}
+                    >
+                      {statusInfo.status === 'Overdue' && <AlertTriangle size={12} />}
+                      {statusInfo.status === 'Due Soon' && <Clock size={12} />}
+                      {statusInfo.status === 'Completed' && <CheckCircle2 size={12} />}
+                      <span>{statusInfo.status}</span>
+                    </span>
+
+                    <span className={`priority-tag ${rem.priority?.toLowerCase() || 'high'}`}>
+                      {rem.priority} Priority
+                    </span>
+                    <span className="rem-cat-tag">{rem.category}</span>
+                  </div>
                 </div>
-                <div className="flex-center-gap text-muted">
-                  <Car size={14} />
-                  <span>{rem.vehicle}</span>
+
+                <div className="rem-meta-row">
+                  <div className="flex-center-gap text-muted">
+                    <Calendar size={14} />
+                    <span>
+                      Target Due: <strong style={{ color: statusInfo.status === 'Overdue' ? '#fca5a5' : statusInfo.status === 'Due Soon' ? 'var(--accent-amber)' : 'inherit' }}>
+                        {rem.dueDate}
+                      </strong>
+                    </span>
+                  </div>
+                  <div className="flex-center-gap text-muted">
+                    <Car size={14} />
+                    <span>{vehicle?.displayName || `${vehicle?.manufacturer} ${vehicle?.model}`}</span>
+                  </div>
                 </div>
+
+                {rem.notes && (
+                  <p className="rem-notes-text">{rem.notes}</p>
+                )}
               </div>
 
-              {rem.notes && (
-                <p className="rem-notes-text">{rem.notes}</p>
-              )}
+              <div className="rem-actions-col">
+                <button 
+                  className="rem-delete-btn"
+                  onClick={() => {
+                    if (window.confirm(`Delete reminder "${rem.title}"?`)) {
+                      deleteReminder(rem.id);
+                    }
+                  }}
+                  title="Delete Reminder"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
-
-            <div className="rem-actions-col">
-              <button 
-                className="rem-delete-btn"
-                onClick={() => deleteReminder(rem.id)}
-                title="Delete Reminder"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
         {filteredReminders.length === 0 && (
-          <div className="search-empty-state" style={{ marginTop: '20px' }}>
-            <Bell size={36} />
-            <p>No reminders found in this filter.</p>
+          <div className="search-empty-state" style={{ marginTop: '20px', padding: '40px 20px' }}>
+            <Bell size={36} style={{ color: 'var(--text-dim)', margin: '0 auto 10px' }} />
+            <p>No reminders found for this filter.</p>
+            <button 
+              className="outline-button" 
+              style={{ width: 'auto', margin: '14px auto 0' }}
+              onClick={() => setIsModalOpen(true)}
+            >
+              <Plus size={15} />
+              <span>Create Reminder</span>
+            </button>
           </div>
         )}
       </div>
 
       {/* ADD REMINDER MODAL */}
       {isModalOpen && (
-        <div className="search-modal-backdrop" onClick={() => setIsModalOpen(false)}>
-          <div className="search-modal" style={{ maxWidth: '520px' }} onClick={e => e.stopPropagation()}>
-            <div className="search-modal-header">
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" style={{ maxWidth: '540px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
               <div className="flex-center-gap">
                 <Bell size={20} className="text-blue" />
                 <h3 style={{ margin: 0, fontSize: '18px' }}>Create Service Reminder</h3>
               </div>
-              <button className="search-modal-close" onClick={() => setIsModalOpen(false)}>✕</button>
+              <button className="modal-close-btn" onClick={() => setIsModalOpen(false)}>✕</button>
             </div>
 
-            <form onSubmit={handleSubmit} style={{ padding: '20px' }}>
+            <form onSubmit={handleSubmit} style={{ paddingTop: '16px' }}>
               <div className="form-grid">
                 <div className="form-group col-span-2">
-                  <label>Reminder Title</label>
+                  <label>Reminder Category *</label>
+                  <select 
+                    className="simple-input"
+                    value={formData.category}
+                    onChange={e => setFormData({ 
+                      ...formData, 
+                      category: e.target.value,
+                      title: formData.title === '' || REMINDER_CATEGORIES.includes(formData.title) ? e.target.value : formData.title
+                    })}
+                  >
+                    {REMINDER_CATEGORIES.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group col-span-2">
+                  <label>Reminder Title *</label>
                   <input 
                     className="simple-input" 
-                    placeholder="e.g. Engine Oil Flush & Filter"
+                    placeholder="e.g. Engine Oil Flush & Filter or Insurance Renewal"
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
                     required
                   />
                 </div>
+
                 <div className="form-group">
-                  <label>Due Date</label>
+                  <label>Target Due Date *</label>
                   <input 
                     type="date" 
                     className="simple-input" 
@@ -188,6 +390,7 @@ export function RemindersView() {
                     required
                   />
                 </div>
+
                 <div className="form-group">
                   <label>Priority</label>
                   <select 
@@ -195,40 +398,33 @@ export function RemindersView() {
                     value={formData.priority}
                     onChange={e => setFormData({ ...formData, priority: e.target.value })}
                   >
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Normal</option>
+                    {REMINDER_PRIORITIES.map(p => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
                   </select>
                 </div>
-                <div className="form-group col-span-2">
-                  <label>Category</label>
-                  <select 
-                    className="simple-input"
-                    value={formData.category}
-                    onChange={e => setFormData({ ...formData, category: e.target.value })}
-                  >
-                    <option>Maintenance</option>
-                    <option>Compliance</option>
-                    <option>Insurance</option>
-                    <option>DIY Care</option>
-                  </select>
-                </div>
+
                 <div className="form-group col-span-2">
                   <label>Special Instructions / Notes</label>
                   <input 
                     className="simple-input" 
-                    placeholder="e.g. Inspect brake pads and top up washer fluid"
+                    placeholder="e.g. Compare quotes with NCB discount before paying"
                     value={formData.notes}
                     onChange={e => setFormData({ ...formData, notes: e.target.value })}
                   />
                 </div>
               </div>
 
-              <div className="form-actions" style={{ marginTop: '20px' }}>
-                <button type="submit" className="primary-button">
+              <div className="form-actions col-span-2" style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+                <button type="submit" className="primary-button" style={{ width: 'auto', padding: '12px 24px' }}>
                   Save Reminder
                 </button>
-                <button type="button" className="outline-button" onClick={() => setIsModalOpen(false)}>
+                <button 
+                  type="button" 
+                  className="outline-button" 
+                  style={{ width: 'auto', padding: '12px 24px' }}
+                  onClick={() => setIsModalOpen(false)}
+                >
                   Cancel
                 </button>
               </div>

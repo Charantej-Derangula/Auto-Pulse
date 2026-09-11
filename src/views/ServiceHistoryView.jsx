@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   History,
   Calendar,
@@ -11,9 +11,11 @@ import {
   Search,
   ChevronDown,
   Filter,
-  Car
+  Car,
+  Gauge
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { normalizeServiceRecord } from '../utils/serviceNormalizer';
 
 export function ServiceHistoryView() {
   const { serviceHistory, vehicle } = useApp();
@@ -22,15 +24,39 @@ export function ServiceHistoryView() {
 
   const categories = ['All', 'Periodic Service', 'Tyres & Alignment', 'Insurance & Legal', 'Oil & Lube'];
 
-  const filteredHistory = serviceHistory.filter(item => {
-    const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.garage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.parts.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
-    return matchesSearch && matchesCat;
-  });
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
 
-  const totalSpentHistory = serviceHistory.reduce((acc, curr) => acc + curr.cost, 0);
+  // 1. Normalize and isolate records for currently active vehicle only
+  const normalizedRecords = useMemo(() => {
+    const rawList = Array.isArray(serviceHistory) ? serviceHistory : [];
+    return rawList
+      .map(item => normalizeServiceRecord(item, vehicle))
+      .filter(Boolean)
+      .filter(record => record.vehicleId === currentVehicleId);
+  }, [serviceHistory, vehicle, currentVehicleId]);
+
+  // 2. Filter normalized records
+  const filteredHistory = useMemo(() => {
+    const searchLower = (searchTerm || '').trim().toLowerCase();
+
+    return normalizedRecords.filter(item => {
+      const matchesSearch = !searchLower || 
+        item.title.toLowerCase().includes(searchLower) ||
+        item.garage.toLowerCase().includes(searchLower) ||
+        item.vehicleName.toLowerCase().includes(searchLower) ||
+        item.parts.some(p => p.toLowerCase().includes(searchLower));
+
+      const matchesCat = selectedCategory === 'All' || item.category === selectedCategory;
+      return matchesSearch && matchesCat;
+    });
+  }, [normalizedRecords, searchTerm, selectedCategory]);
+
+  // 3. Compute Lifetime Recorded Spend for completed/paid services of this vehicle
+  const totalSpentHistory = useMemo(() => {
+    return normalizedRecords
+      .filter(item => item.status !== 'Scheduled' && item.status !== 'Upcoming')
+      .reduce((acc, curr) => acc + (Number(curr.cost) || 0), 0);
+  }, [normalizedRecords]);
 
   return (
     <div className="view-page-container">
@@ -38,7 +64,9 @@ export function ServiceHistoryView() {
       <div className="page-header-row">
         <div>
           <h2>Service History & Invoices</h2>
-          <p>Complete historical log of garage visits, part replacements, and service costs for {vehicle?.manufacturer} {vehicle?.model}.</p>
+          <p>
+            Complete historical log of garage visits, scheduled appointments, and verified parts for {vehicle?.displayName || `${vehicle?.manufacturer || 'Honda'} ${vehicle?.model || 'City'}`}.
+          </p>
         </div>
 
         <div className="history-total-spend-pill">
@@ -98,29 +126,70 @@ export function ServiceHistoryView() {
                     </div>
                     <div className="flex-center-gap">
                       <Car size={14} className="text-muted" />
-                      <span>{item.odometer.toLocaleString()} km</span>
+                      <span>{item.vehicleName}</span>
+                    </div>
+                    <div className="flex-center-gap">
+                      <Gauge size={14} className="text-muted" />
+                      <span>{item.odometerFormatted}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="timeline-cost-badge">
-                  <strong>₹{item.cost.toLocaleString()}</strong>
-                  <span className="badge-good">Verified Paid</span>
+                  <strong>{item.displayCost}</strong>
+                  {item.status === 'Scheduled' || item.status === 'Upcoming' ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
+                      <span 
+                        style={{ 
+                          fontSize: '11px', 
+                          padding: '2px 8px', 
+                          borderRadius: '4px', 
+                          background: 'rgba(56, 168, 255, 0.15)', 
+                          color: 'var(--accent-blue)', 
+                          fontWeight: '700',
+                          border: '1px solid rgba(56, 168, 255, 0.3)'
+                        }}
+                      >
+                        Scheduled
+                      </span>
+                      <span style={{ fontSize: '10px', color: '#f59e0b', fontWeight: '600' }}>
+                        Payment: Not Paid
+                      </span>
+                    </div>
+                  ) : item.status === 'In Progress' ? (
+                    <span 
+                      style={{ 
+                        fontSize: '11px', 
+                        padding: '2px 8px', 
+                        borderRadius: '4px', 
+                        background: 'rgba(245, 158, 11, 0.15)', 
+                        color: 'var(--accent-amber)', 
+                        fontWeight: '700',
+                        border: '1px solid rgba(245, 158, 11, 0.3)'
+                      }}
+                    >
+                      In Progress
+                    </span>
+                  ) : (
+                    <span className="badge-good">Verified Paid</span>
+                  )}
                 </div>
               </div>
 
               {/* PARTS REPLACED */}
-              <div className="timeline-parts-section">
-                <span className="parts-heading">Parts Installed / Work Carried Out:</span>
-                <div className="parts-tags-wrap">
-                  {item.parts.map((part, pIdx) => (
-                    <span key={pIdx} className="part-tag">
-                      <CheckCircle2 size={12} className="text-emerald" />
-                      {part}
-                    </span>
-                  ))}
+              {item.parts.length > 0 && (
+                <div className="timeline-parts-section">
+                  <span className="parts-heading">Parts Installed / Work Carried Out:</span>
+                  <div className="parts-tags-wrap">
+                    {item.parts.map((part, pIdx) => (
+                      <span key={pIdx} className="part-tag">
+                        <CheckCircle2 size={12} className="text-emerald" />
+                        {part}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {item.notes && (
                 <div className="timeline-notes-box">
@@ -133,9 +202,9 @@ export function ServiceHistoryView() {
         ))}
 
         {filteredHistory.length === 0 && (
-          <div className="search-empty-state" style={{ padding: '40px' }}>
-            <History size={36} />
-            <p>No service records match your filter criteria.</p>
+          <div className="search-empty-state" style={{ padding: '40px', textAlign: 'center' }}>
+            <History size={36} style={{ color: '#64748b', marginBottom: '10px' }} />
+            <p style={{ color: '#94a3b8', fontSize: '14px' }}>No service records match your filter criteria.</p>
           </div>
         )}
       </div>

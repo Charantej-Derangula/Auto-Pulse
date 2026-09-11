@@ -21,6 +21,8 @@ import { NotFoundView } from './views/NotFoundView';
 
 import './App.css';
 
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 function MainAppContent() {
   const { isAuthenticated } = useApp();
 
@@ -75,10 +77,12 @@ function MainAppContent() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <BrowserRouter>
-        <MainAppContent />
-      </BrowserRouter>
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <BrowserRouter>
+          <MainAppContent />
+        </BrowserRouter>
+      </AppProvider>
+    </ErrorBoundary>
   );
 }

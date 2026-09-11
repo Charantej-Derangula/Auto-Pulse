@@ -17,13 +17,21 @@ import {
 } from 'lucide-react';
 import { useApp, DEMO_VEHICLES } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
+import { calculateDocumentStatus } from '../services/DocumentService';
 
 export function MyVehicleView() {
-  const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError, vehicleHealth } = useApp();
+  const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError, vehicleHealth, documents } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(vehicle || DEMO_VEHICLES[0]);
   const [savedAlert, setSavedAlert] = useState(false);
   const [selectedHealthSub, setSelectedHealthSub] = useState(null);
+
+  // Sync formData when vehicle changes externally
+  React.useEffect(() => {
+    if (vehicle) {
+      setFormData(vehicle);
+    }
+  }, [vehicle]);
 
   const handleSelectDemo = async (e) => {
     const selected = DEMO_VEHICLES.find(v => v.model === e.target.value);
@@ -45,7 +53,12 @@ export function MyVehicleView() {
 
   const handleSave = async (e) => {
     e.preventDefault();
-    await setVehicle(formData);
+    // Preserve stable unique vehicleId during details editing
+    const updated = {
+      ...formData,
+      id: vehicle?.id || formData.id || `${formData.manufacturer?.toLowerCase()}-${formData.model?.toLowerCase()}`
+    };
+    await setVehicle(updated);
     setIsEditing(false);
     setSavedAlert(true);
     setTimeout(() => setSavedAlert(false), 3000);
@@ -352,38 +365,45 @@ export function MyVehicleView() {
           </div>
 
           <div className="compliance-cards-list">
-            <div className="compliance-row">
-              <div className="compliance-icon-wrap green">
-                <CheckCircle2 size={18} />
-              </div>
-              <div className="compliance-info">
-                <strong>Registration Certificate (RC)</strong>
-                <span>Valid until 14 Mar 2038</span>
-              </div>
-              <span className="badge-good">Active</span>
-            </div>
+            {(() => {
+              const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+              const vDocs = Array.isArray(documents)
+                ? documents.filter(d => (d.vehicleId === currentVId || (!d.vehicleId && currentVId === 'honda-city')))
+                : [];
 
-            <div className="compliance-row">
-              <div className="compliance-icon-wrap amber">
-                <AlertCircle size={18} />
-              </div>
-              <div className="compliance-info">
-                <strong>Comprehensive Insurance</strong>
-                <span>Expires Nov 20, 2026 (72 days)</span>
-              </div>
-              <span className="badge-warning">Due Soon</span>
-            </div>
+              if (vDocs.length === 0) {
+                return (
+                  <div style={{ padding: '16px', textAlign: 'center', color: 'var(--text-dim)' }}>
+                    <small>No compliance certificates uploaded for this vehicle.</small>
+                    <div style={{ marginTop: '8px' }}>
+                      <button className="outline-button" style={{ fontSize: '12px', padding: '6px 14px' }} onClick={() => setActiveTab('Documents')}>
+                        + Add Document
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
 
-            <div className="compliance-row">
-              <div className="compliance-icon-wrap amber">
-                <AlertCircle size={18} />
-              </div>
-              <div className="compliance-info">
-                <strong>Pollution Under Control (PUC)</strong>
-                <span>Expires Oct 15, 2026 (34 days)</span>
-              </div>
-              <span className="badge-warning">Renew</span>
-            </div>
+              return vDocs.slice(0, 3).map(doc => {
+                const statusInfo = calculateDocumentStatus(doc.expiryDate);
+                const isDanger = statusInfo.statusType === 'danger';
+                const isWarning = statusInfo.statusType === 'warning';
+                return (
+                  <div key={doc.id} className="compliance-row">
+                    <div className={`compliance-icon-wrap ${isDanger ? 'red' : isWarning ? 'amber' : 'green'}`} style={isDanger ? { background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' } : undefined}>
+                      {isDanger ? <AlertCircle size={18} /> : isWarning ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
+                    </div>
+                    <div className="compliance-info">
+                      <strong>{doc.title}</strong>
+                      <span>Expires {doc.expiryDate} {statusInfo.daysRemaining !== null ? `(${statusInfo.daysRemaining < 0 ? 'Passed' : `${statusInfo.daysRemaining} days left`})` : ''}</span>
+                    </div>
+                    <span className={isDanger ? 'badge-danger' : isWarning ? 'badge-warning' : 'badge-good'} style={isDanger ? { background: 'rgba(239, 68, 68, 0.15)', color: '#fca5a5', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '700' } : undefined}>
+                      {isDanger ? 'Expired' : isWarning ? 'Due Soon' : 'Valid'}
+                    </span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </div>
 

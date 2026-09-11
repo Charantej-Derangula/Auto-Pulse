@@ -162,8 +162,13 @@ export function buildVehicleObject(data, resolvedImage = null) {
   const model = (data?.model || 'City').trim();
   const displayName = `${manufacturer} ${model}`;
 
+  const cleanMakeSlug = manufacturer.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const cleanModelSlug = model.toLowerCase().replace(/[^a-z0-9]/g, '-');
+  const stableId = data?.id || `${cleanMakeSlug}-${cleanModelSlug}`;
+
   return {
-    id: data?.id || `${manufacturer.toLowerCase()}-${model.toLowerCase()}-${Date.now()}`,
+    id: stableId,
+    vehicleId: stableId,
     manufacturer,
     model,
     variant: data?.variant || 'Standard',

@@ -9,6 +9,14 @@ import { getUserLocation } from '../services/LocationService';
 import { fetchCurrentWeather } from '../services/WeatherService';
 import { fetchNearbyGarages } from '../services/GarageService';
 import { getVehicleHealthAssessment } from '../services/VehicleHealthService';
+import { 
+  normalizeDocument, 
+  normalizeReminder, 
+  loadDocumentsStorage, 
+  loadRemindersStorage,
+  calculateDocumentStatus,
+  calculateReminderStatus
+} from '../services/DocumentService';
 
 const AppContext = createContext();
 
@@ -360,77 +368,99 @@ export const INITIAL_GARAGES = [
 export const INITIAL_DOCUMENTS = [
   {
     id: 'doc-rc',
+    documentId: 'doc-rc',
+    vehicleId: 'honda-city',
     title: 'Registration Certificate (RC)',
     subtitle: 'Ministry of Road Transport & Highways',
     docNumber: 'TS09FH4821',
     category: 'Registration',
+    documentType: 'Registration Certificate (RC)',
     status: 'Valid',
     statusType: 'success',
-    issueDate: '15 Mar 2023',
-    expiryDate: '14 Mar 2038',
+    issueDate: '2023-03-15',
+    expiryDate: '2038-03-14',
     fileSize: '2.4 MB',
-    fileType: 'PDF'
+    fileType: 'PDF',
+    notes: 'Permanent Registration with RTA Hyderabad'
   },
   {
     id: 'doc-insurance',
+    documentId: 'doc-insurance',
+    vehicleId: 'honda-city',
     title: 'Comprehensive Motor Insurance',
     subtitle: 'HDFC ERGO General Insurance Policy',
     docNumber: 'POL-2025-998812',
     category: 'Insurance',
-    status: 'Valid (Expires in 72 days)',
-    statusType: 'warning',
-    issueDate: '21 Nov 2024',
-    expiryDate: '20 Nov 2026',
+    documentType: 'Insurance',
+    status: 'Valid',
+    statusType: 'success',
+    issueDate: '2025-11-21',
+    expiryDate: '2026-11-20',
     fileSize: '4.1 MB',
-    fileType: 'PDF'
+    fileType: 'PDF',
+    notes: 'Zero-depreciation + Engine protection add-on'
   },
   {
     id: 'doc-puc',
+    documentId: 'doc-puc',
+    vehicleId: 'honda-city',
     title: 'Pollution Under Control (PUC)',
     subtitle: 'Bharat Stage VI Emission Standard',
     docNumber: 'PUC-TS-09-88192',
     category: 'Compliance',
-    status: 'Expiring Soon (34 days)',
+    documentType: 'Pollution Certificate (PUC)',
+    status: 'Expiring Soon',
     statusType: 'warning',
-    issueDate: '16 Apr 2026',
-    expiryDate: '15 Oct 2026',
+    issueDate: '2026-04-16',
+    expiryDate: '2026-10-15',
     fileSize: '1.2 MB',
-    fileType: 'PDF'
+    fileType: 'PDF',
+    notes: 'Emission levels within BS6 threshold'
   },
   {
     id: 'doc-dl',
+    documentId: 'doc-dl',
+    vehicleId: 'honda-city',
     title: "Driver's License (DL)",
     subtitle: 'Light Motor Vehicle (LMV) + MCWG',
     docNumber: 'DL-0920180049102',
     category: 'Personal ID',
+    documentType: "Driver's License (DL)",
     status: 'Valid',
     statusType: 'success',
-    issueDate: '10 Jan 2018',
-    expiryDate: '09 Jan 2038',
+    issueDate: '2018-01-10',
+    expiryDate: '2038-01-09',
     fileSize: '1.8 MB',
-    fileType: 'PDF'
+    fileType: 'PDF',
+    notes: 'Transport Authority Smart Card'
   },
   {
     id: 'doc-rsa',
+    documentId: 'doc-rsa',
+    vehicleId: 'honda-city',
     title: '24/7 Roadside Assistance Card',
     subtitle: 'Towing, Flat Tyre, Battery Jumpstart',
     docNumber: 'RSA-AP-99042',
     category: 'Emergency',
-    status: 'Active',
+    documentType: 'Roadside Assistance (RSA)',
+    status: 'Valid',
     statusType: 'success',
-    issueDate: '01 Jan 2026',
-    expiryDate: '31 Dec 2026',
+    issueDate: '2026-01-01',
+    expiryDate: '2026-12-31',
     fileSize: '850 KB',
-    fileType: 'PDF'
+    fileType: 'PDF',
+    notes: 'Nationwide 24x7 roadside emergency coverage'
   }
 ];
 
 export const INITIAL_REMINDERS = [
   {
     id: 'rem-1',
+    reminderId: 'rem-1',
+    vehicleId: 'honda-city',
     title: 'PUC Renewal Inspection',
     dueDate: '2026-10-15',
-    category: 'Compliance',
+    category: 'PUC renewal',
     priority: 'High',
     vehicle: 'Honda City (TS 09 FH 4821)',
     completed: false,
@@ -438,9 +468,11 @@ export const INITIAL_REMINDERS = [
   },
   {
     id: 'rem-2',
+    reminderId: 'rem-2',
+    vehicleId: 'honda-city',
     title: '50,000 km Major General Service',
     dueDate: '2026-12-10',
-    category: 'Maintenance',
+    category: 'Vehicle service',
     priority: 'High',
     vehicle: 'Honda City (TS 09 FH 4821)',
     completed: false,
@@ -448,6 +480,8 @@ export const INITIAL_REMINDERS = [
   },
   {
     id: 'rem-3',
+    reminderId: 'rem-3',
+    vehicleId: 'honda-city',
     title: 'Tyre Rotation & Wheel Balancing',
     dueDate: '2026-09-25',
     category: 'Maintenance',
@@ -458,9 +492,11 @@ export const INITIAL_REMINDERS = [
   },
   {
     id: 'rem-4',
+    reminderId: 'rem-4',
+    vehicleId: 'honda-city',
     title: 'Renew Comprehensive Insurance',
     dueDate: '2026-11-20',
-    category: 'Insurance',
+    category: 'Insurance renewal',
     priority: 'High',
     vehicle: 'Honda City (TS 09 FH 4821)',
     completed: false,
@@ -468,6 +504,8 @@ export const INITIAL_REMINDERS = [
   },
   {
     id: 'rem-5',
+    reminderId: 'rem-5',
+    vehicleId: 'honda-city',
     title: 'Top up Windshield Washer Fluid',
     dueDate: '2026-09-12',
     category: 'DIY Care',
@@ -481,6 +519,7 @@ export const INITIAL_REMINDERS = [
 export const INITIAL_FUEL_LOGS = [
   {
     id: 'fuel-1',
+    vehicleId: 'honda-city',
     date: '2026-09-04',
     station: 'Shell V-Power — Jubilee Hills',
     litres: 34.2,
@@ -493,6 +532,7 @@ export const INITIAL_FUEL_LOGS = [
   },
   {
     id: 'fuel-2',
+    vehicleId: 'honda-city',
     date: '2026-08-22',
     station: 'Indian Oil XP95 — Gachibowli',
     litres: 32.8,
@@ -505,6 +545,7 @@ export const INITIAL_FUEL_LOGS = [
   },
   {
     id: 'fuel-3',
+    vehicleId: 'honda-city',
     date: '2026-08-08',
     station: 'HP Auto Care — Hitec City',
     litres: 35.0,
@@ -517,6 +558,7 @@ export const INITIAL_FUEL_LOGS = [
   },
   {
     id: 'fuel-4',
+    vehicleId: 'honda-city',
     date: '2026-07-24',
     station: 'Bharat Petroleum Speed — Madhapur',
     litres: 33.5,
@@ -532,6 +574,8 @@ export const INITIAL_FUEL_LOGS = [
 export const INITIAL_SERVICE_HISTORY = [
   {
     id: 'srv-1',
+    vehicleId: 'honda-city',
+    vehicleName: 'Honda City',
     title: '40,000 km Scheduled Service & Synthetic Oil',
     date: 'Aug 10, 2025',
     garage: 'Honda Pride City Service Center',
@@ -544,6 +588,8 @@ export const INITIAL_SERVICE_HISTORY = [
   },
   {
     id: 'srv-2',
+    vehicleId: 'honda-city',
+    vehicleName: 'Honda City',
     title: 'Tyre Rotation & 3D Wheel Alignment',
     date: 'Jul 22, 2025',
     garage: 'Precision Tyres & 3D Laser Alignment',
@@ -556,6 +602,8 @@ export const INITIAL_SERVICE_HISTORY = [
   },
   {
     id: 'srv-3',
+    vehicleId: 'honda-city',
+    vehicleName: 'Honda City',
     title: 'Annual Comprehensive Insurance Renewal',
     date: 'Jun 15, 2025',
     garage: 'HDFC ERGO Direct Portal',
@@ -568,6 +616,8 @@ export const INITIAL_SERVICE_HISTORY = [
   },
   {
     id: 'srv-4',
+    vehicleId: 'honda-city',
+    vehicleName: 'Honda City',
     title: 'Intermediate Engine Oil & Filter Change',
     date: 'Feb 18, 2025',
     garage: 'Apex AutoCraft & Performance',
@@ -584,24 +634,34 @@ export function AppProvider({ children }) {
   // Authentication State (defaults to false for first visit, persisted safely with corruption recovery)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return false;
       const localAuth = localStorage.getItem('autopulse_auth');
-      const sessionAuth = sessionStorage.getItem('autopulse_auth');
+      const sessionAuth = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('autopulse_auth') : null;
       const val = localAuth !== null ? localAuth : sessionAuth;
       if (val === null) return false;
       return JSON.parse(val) === true;
     } catch (e) {
       console.warn('[AppContext] Malformed auth storage, resetting to unauthenticated:', e);
-      localStorage.removeItem('autopulse_auth');
-      sessionStorage.removeItem('autopulse_auth');
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.removeItem('autopulse_auth');
+        if (typeof sessionStorage !== 'undefined') sessionStorage.removeItem('autopulse_auth');
+      } catch (_) {}
       return false;
     }
   });
 
   // User Profile State
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('autopulse_user');
-    if (savedUser) {
-      try { return JSON.parse(savedUser); } catch (e) { console.error(e); }
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const savedUser = localStorage.getItem('autopulse_user');
+        if (savedUser) {
+          const parsed = JSON.parse(savedUser);
+          if (parsed && typeof parsed === 'object') return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('[AppContext] Malformed user profile in storage:', e);
     }
     return {
       name: 'Charantej',
@@ -622,14 +682,18 @@ export function AppProvider({ children }) {
 
   // Active Vehicle State
   const [vehicle, setVehicle] = useState(() => {
-    const savedVehicle = localStorage.getItem('garage_vehicle') || localStorage.getItem('autopulse_vehicle');
-    if (savedVehicle) {
-      try { 
-        const parsed = JSON.parse(savedVehicle);
-        return buildVehicleObject(parsed, parsed.image || parsed.imageUrl);
-      } catch (e) { 
-        console.error(e); 
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const savedVehicle = localStorage.getItem('garage_vehicle') || localStorage.getItem('autopulse_vehicle');
+        if (savedVehicle) {
+          const parsed = JSON.parse(savedVehicle);
+          if (parsed && typeof parsed === 'object') {
+            return buildVehicleObject(parsed, parsed.image || parsed.imageUrl);
+          }
+        }
       }
+    } catch (e) {
+      console.warn('[AppContext] Malformed vehicle in storage:', e);
     }
     return DEMO_VEHICLES[0];
   });
@@ -679,10 +743,195 @@ export function AppProvider({ children }) {
   const [diagnostics, setDiagnostics] = useState(INITIAL_DIAGNOSTICS);
   const [selectedDiagnosticId, setSelectedDiagnosticId] = useState('brake-noise');
   const [garages, setGarages] = useState(INITIAL_GARAGES);
-  const [documents, setDocuments] = useState(INITIAL_DOCUMENTS);
-  const [reminders, setReminders] = useState(INITIAL_REMINDERS);
+  const [documents, setDocuments] = useState(() => loadDocumentsStorage(INITIAL_DOCUMENTS));
+  const [reminders, setReminders] = useState(() => loadRemindersStorage(INITIAL_REMINDERS));
   const [fuelLogs, setFuelLogs] = useState(INITIAL_FUEL_LOGS);
-  const [serviceHistory, setServiceHistory] = useState(INITIAL_SERVICE_HISTORY);
+  
+  // Persistent Service History State
+  const [serviceHistory, setServiceHistory] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('autopulse_service_history');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('[AppContext] Malformed service history in storage:', e);
+    }
+    return INITIAL_SERVICE_HISTORY;
+  });
+
+  // Persistent Maintenance Checklist Items
+  const [maintenanceItems, setMaintenanceItems] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('autopulse_maintenance_items');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('[AppContext] Malformed maintenance items in storage:', e);
+    }
+    return [
+      {
+        id: 'maint-1',
+        title: 'Engine Oil & Filter Renewal',
+        category: 'Engine Oil',
+        dueOdometer: 50000,
+        dueDate: '2026-12-10',
+        notes: '0W-20 Fully Synthetic Oil with OEM filter element',
+        completed: false,
+        vehicleId: 'honda-city'
+      },
+      {
+        id: 'maint-2',
+        title: '3D Wheel Alignment & Tyre Rotation',
+        category: 'Tyre Rotation',
+        dueOdometer: 45000,
+        dueDate: '2026-09-25',
+        notes: 'Rotate all 4 wheels and balance front axle',
+        completed: false,
+        vehicleId: 'honda-city'
+      },
+      {
+        id: 'maint-3',
+        title: 'Brake Caliper & Pad Inspection',
+        category: 'Brake Inspection',
+        dueOdometer: 45000,
+        dueDate: '2026-10-05',
+        notes: 'Measure brake pad lining thickness (>3mm threshold)',
+        completed: false,
+        vehicleId: 'honda-city'
+      },
+      {
+        id: 'maint-4',
+        title: '12V Starter Battery Health Check',
+        category: 'Battery Check',
+        dueOdometer: 48000,
+        dueDate: '2026-11-15',
+        notes: 'Conductance load test and terminal corrosion clean',
+        completed: false,
+        vehicleId: 'honda-city'
+      },
+      {
+        id: 'maint-5',
+        title: 'Cabin HEPA Pollen & Engine Air Filter',
+        category: 'Air Filter',
+        dueOdometer: 50000,
+        dueDate: '2026-12-10',
+        notes: 'Clean/replace cabin air filter for optimal AC efficiency',
+        completed: false,
+        vehicleId: 'honda-city'
+      }
+    ];
+  });
+
+  // Persistent General Expenses State
+  const [expenses, setExpenses] = useState(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('autopulse_expenses');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('[AppContext] Malformed expenses in storage:', e);
+    }
+    return [
+      {
+        id: 'exp-1',
+        category: 'Service',
+        amount: 8400,
+        date: '2025-08-10',
+        description: '40,000 km Scheduled Service & Synthetic Oil',
+        vehicleId: 'honda-city',
+        vehicleName: 'Honda City'
+      },
+      {
+        id: 'exp-2',
+        category: 'Parts',
+        amount: 1200,
+        date: '2025-07-22',
+        description: 'Wheel balancing counter-weights & nitrogen top-up',
+        vehicleId: 'honda-city',
+        vehicleName: 'Honda City'
+      },
+      {
+        id: 'exp-3',
+        category: 'Insurance',
+        amount: 12300,
+        date: '2025-06-15',
+        description: 'Annual Comprehensive Zero-Dep Insurance Renewal',
+        vehicleId: 'honda-city',
+        vehicleName: 'Honda City'
+      },
+      {
+        id: 'exp-4',
+        category: 'Fuel',
+        amount: 3950,
+        date: '2026-08-22',
+        description: 'Shell V-Power Petrol Full Tank (36.0 L)',
+        vehicleId: 'honda-city',
+        vehicleName: 'Honda City'
+      },
+      {
+        id: 'exp-5',
+        category: 'Repairs',
+        amount: 2500,
+        date: '2025-02-18',
+        description: 'Intermediate oil change and wiper blade replacement',
+        vehicleId: 'honda-city',
+        vehicleName: 'Honda City'
+      }
+    ];
+  });
+
+  // Persist collections to localStorage safely
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_service_history', JSON.stringify(serviceHistory));
+      }
+    } catch (e) {}
+  }, [serviceHistory]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_maintenance_items', JSON.stringify(maintenanceItems));
+      }
+    } catch (e) {}
+  }, [maintenanceItems]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_expenses', JSON.stringify(expenses));
+      }
+    } catch (e) {}
+  }, [expenses]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_documents', JSON.stringify(documents));
+      }
+    } catch (e) {}
+  }, [documents]);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_reminders', JSON.stringify(reminders));
+      }
+    } catch (e) {}
+  }, [reminders]);
 
   // User Location State (External Geolocation & Reverse Geocoding)
   const [userLocation, setUserLocation] = useState({
@@ -753,17 +1002,25 @@ export function AppProvider({ children }) {
   }, [isAuthenticated]);
 
   useEffect(() => {
-    localStorage.setItem('autopulse_user', JSON.stringify(user));
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        localStorage.setItem('autopulse_user', JSON.stringify(user));
+      }
+    } catch (_) {}
   }, [user]);
 
   useEffect(() => {
-    if (vehicle) {
-      localStorage.setItem('garage_vehicle', JSON.stringify(vehicle));
-      localStorage.setItem('autopulse_vehicle', JSON.stringify(vehicle));
-    } else {
-      localStorage.removeItem('garage_vehicle');
-      localStorage.removeItem('autopulse_vehicle');
-    }
+    try {
+      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+        if (vehicle) {
+          localStorage.setItem('garage_vehicle', JSON.stringify(vehicle));
+          localStorage.setItem('autopulse_vehicle', JSON.stringify(vehicle));
+        } else {
+          localStorage.removeItem('garage_vehicle');
+          localStorage.removeItem('autopulse_vehicle');
+        }
+      }
+    } catch (_) {}
   }, [vehicle]);
 
   // 1. Detect user location once on mount (Non-blocking, cached, safe fallback)
@@ -836,7 +1093,12 @@ export function AppProvider({ children }) {
   useEffect(() => {
     let isMounted = true;
     setIsVehicleHealthLoading(true);
-    getVehicleHealthAssessment(vehicle, serviceHistory, selectedDiagnosticId, diagnostics)
+    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+    const vehicleServices = Array.isArray(serviceHistory) 
+      ? serviceHistory.filter(s => s.vehicleId === currentVId || (!s.vehicleId && currentVId === 'honda-city'))
+      : [];
+
+    getVehicleHealthAssessment(vehicle, vehicleServices, selectedDiagnosticId, diagnostics)
       .then((assessment) => {
         if (isMounted && assessment) {
           setVehicleHealth(assessment);
@@ -895,15 +1157,45 @@ export function AppProvider({ children }) {
 
   // Reminder methods
   const toggleReminder = (id) => {
-    setReminders(prev => prev.map(r => r.id === id ? { ...r, completed: !r.completed } : r));
+    setReminders(prev => prev.map(r => {
+      if (r.id === id || r.reminderId === id) {
+        const nextCompleted = !r.completed;
+        return {
+          ...r,
+          completed: nextCompleted,
+          completedDate: nextCompleted ? new Date().toISOString().split('T')[0] : null
+        };
+      }
+      return r;
+    }));
   };
 
   const addReminder = (newRem) => {
-    setReminders(prev => [{ ...newRem, id: 'rem-' + Date.now(), completed: false }, ...prev]);
+    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+    const normalized = normalizeReminder({
+      ...newRem,
+      vehicleId: newRem.vehicleId || currentVId,
+      vehicle: newRem.vehicle || `${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''} (${vehicle?.regNumber || 'TS 09 FH 4821'})`
+    }, currentVId);
+    setReminders(prev => [normalized, ...prev]);
   };
 
   const deleteReminder = (id) => {
-    setReminders(prev => prev.filter(r => r.id !== id));
+    setReminders(prev => prev.filter(r => r.id !== id && r.reminderId !== id));
+  };
+
+  // Document methods
+  const addDocument = (doc) => {
+    const currentVId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+    const normalized = normalizeDocument({
+      ...doc,
+      vehicleId: doc.vehicleId || currentVId
+    }, currentVId);
+    setDocuments(prev => [normalized, ...prev]);
+  };
+
+  const deleteDocument = (id) => {
+    setDocuments(prev => prev.filter(d => d.id !== id && d.documentId !== id));
   };
 
   // Fuel log methods
@@ -916,9 +1208,36 @@ export function AppProvider({ children }) {
     setServiceHistory(prev => [record, ...prev]);
   };
 
-  // Document methods
-  const addDocument = (doc) => {
-    setDocuments(prev => [doc, ...prev]);
+  // Maintenance item methods
+  const addMaintenanceItem = (item) => {
+    setMaintenanceItems(prev => [item, ...prev]);
+  };
+
+  const toggleMaintenanceItem = (id) => {
+    setMaintenanceItems(prev => prev.map(m => {
+      if (m.id === id) {
+        const nextCompleted = !m.completed;
+        return {
+          ...m,
+          completed: nextCompleted,
+          completedDate: nextCompleted ? new Date().toISOString().split('T')[0] : null
+        };
+      }
+      return m;
+    }));
+  };
+
+  const deleteMaintenanceItem = (id) => {
+    setMaintenanceItems(prev => prev.filter(m => m.id !== id));
+  };
+
+  // Expense methods
+  const addExpense = (expense) => {
+    setExpenses(prev => [expense, ...prev]);
+  };
+
+  const deleteExpense = (id) => {
+    setExpenses(prev => prev.filter(e => e.id !== id));
   };
 
   // Navigate helper
@@ -956,6 +1275,7 @@ export function AppProvider({ children }) {
     refreshGarages,
     documents,
     addDocument,
+    deleteDocument,
     reminders,
     toggleReminder,
     addReminder,
@@ -964,6 +1284,14 @@ export function AppProvider({ children }) {
     addFuelLog,
     serviceHistory,
     addServiceRecord,
+    // Maintenance & Expenses State
+    maintenanceItems,
+    addMaintenanceItem,
+    toggleMaintenanceItem,
+    deleteMaintenanceItem,
+    expenses,
+    addExpense,
+    deleteExpense,
     // Location & Weather Services
     userLocation,
     setUserLocation,

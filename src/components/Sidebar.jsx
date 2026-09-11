@@ -18,9 +18,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
 export function Sidebar() {
-  const { isSidebarOpen, setIsSidebarOpen, vehicle, setActiveTab } = useApp();
+  const { isSidebarOpen, setIsSidebarOpen, vehicle, setActiveTab, documents, reminders } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+  const vehicleDocCount = Array.isArray(documents) 
+    ? documents.filter(d => (d.vehicleId === currentVehicleId || (!d.vehicleId && currentVehicleId === 'honda-city'))).length 
+    : 0;
+  const vehiclePendingRemindersCount = Array.isArray(reminders)
+    ? reminders.filter(r => (r.vehicleId === currentVehicleId || (!r.vehicleId && currentVehicleId === 'honda-city')) && !r.completed).length
+    : 0;
 
   const navItems = [
     { id: 'Dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null, path: '/dashboard' },
@@ -28,8 +36,8 @@ export function Sidebar() {
     { id: 'Diagnose Issue', label: 'Diagnose Issue', icon: Stethoscope, badge: 'AI', path: '/diagnose' },
     { id: 'Service & Maintenance', label: 'Service & Maintenance', icon: Wrench, badge: null, path: '/maintenance' },
     { id: 'Fuel & Expenses', label: 'Fuel & Expenses', icon: Fuel, badge: null, path: '/fuel-expenses' },
-    { id: 'Documents', label: 'Documents', icon: FileText, badge: '5', path: '/documents' },
-    { id: 'Reminders', label: 'Reminders', icon: Bell, badge: '4', path: '/reminders' },
+    { id: 'Documents', label: 'Documents', icon: FileText, badge: vehicleDocCount > 0 ? `${vehicleDocCount}` : null, path: '/documents' },
+    { id: 'Reminders', label: 'Reminders', icon: Bell, badge: vehiclePendingRemindersCount > 0 ? `${vehiclePendingRemindersCount}` : null, path: '/reminders' },
     { id: 'Service History', label: 'Service History', icon: History, badge: null, path: '/service-history' },
     { id: 'Find Garage', label: 'Find Garage', icon: MapPin, badge: 'Nearby', path: '/find-garage' },
     { id: 'Settings', label: 'Settings', icon: Settings, badge: null, path: '/settings' }

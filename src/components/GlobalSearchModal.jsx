@@ -26,7 +26,8 @@ export function GlobalSearchModal() {
     setSelectedDiagnosticId,
     vehicle,
     garages,
-    documents
+    documents,
+    reminders
   } = useApp();
 
   const inputRef = useRef(null);
@@ -62,14 +63,27 @@ export function GlobalSearchModal() {
     { title: 'Starting Problem / Slow Cranking', category: 'Diagnostics', tab: 'Diagnose Issue', diagId: 'starting-problem', icon: Stethoscope, desc: '12V battery test, terminal corrosion, starter motor' },
     { title: 'Suspension Clunk / Steering Vibration', category: 'Diagnostics', tab: 'Diagnose Issue', diagId: 'suspension-noise', icon: Stethoscope, desc: 'Link rods, strut leak, control arm bushing, wheel balance' },
 
-    // Documents
-    ...documents.map(d => ({
-      title: `${d.title} (${d.docNumber})`,
-      category: 'Documents',
-      tab: 'Documents',
-      icon: FileText,
-      desc: `Status: ${d.status} • Expiry: ${d.expiryDate}`
-    })),
+    // Documents (Current Vehicle)
+    ...(Array.isArray(documents) ? documents : [])
+      .filter(d => (d.vehicleId === (vehicle?.id || vehicle?.vehicleId || 'honda-city') || (!d.vehicleId && (vehicle?.id || vehicle?.vehicleId || 'honda-city') === 'honda-city')))
+      .map(d => ({
+        title: `${d.title} (${d.docNumber})`,
+        category: 'Documents',
+        tab: 'Documents',
+        icon: FileText,
+        desc: `Category: ${d.category || d.documentType} • Expiry: ${d.expiryDate}`
+      })),
+
+    // Reminders (Current Vehicle)
+    ...(Array.isArray(reminders) ? reminders : [])
+      .filter(r => (r.vehicleId === (vehicle?.id || vehicle?.vehicleId || 'honda-city') || (!r.vehicleId && (vehicle?.id || vehicle?.vehicleId || 'honda-city') === 'honda-city')))
+      .map(r => ({
+        title: `${r.title} (${r.category})`,
+        category: 'Reminders',
+        tab: 'Reminders',
+        icon: Bell,
+        desc: `Due: ${r.dueDate} • Priority: ${r.priority} • Status: ${r.completed ? 'Completed' : 'Active'}`
+      })),
 
     // Garages
     ...garages.map(g => ({

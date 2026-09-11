@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Car,
   Gauge,
@@ -30,6 +30,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
+import { calculateDocumentStatus, calculateReminderStatus } from '../services/DocumentService';
 
 export function DashboardView() {
   const navigate = useNavigate();
@@ -42,7 +43,9 @@ export function DashboardView() {
     fuelLogs,
     vehicleHealth,
     userLocation,
-    garages
+    garages,
+    documents,
+    reminders
   } = useApp();
 
   const [selectedHealthComp, setSelectedHealthComp] = useState(null);
@@ -50,6 +53,64 @@ export function DashboardView() {
   const [uploadedFileName, setUploadedFileName] = useState('');
   const [isAnalyzingEstimate, setIsAnalyzingEstimate] = useState(false);
   const [estimateResult, setEstimateResult] = useState(null);
+
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+
+  // Live Vehicle Document & Reminder Alerts calculation
+  const complianceAlerts = useMemo(() => {
+    const alerts = [];
+    const vDocs = Array.isArray(documents)
+      ? documents.filter(d => (d.vehicleId === currentVehicleId || (!d.vehicleId && currentVehicleId === 'honda-city')))
+      : [];
+    const vRems = Array.isArray(reminders)
+      ? reminders.filter(r => (r.vehicleId === currentVehicleId || (!r.vehicleId && currentVehicleId === 'honda-city')))
+      : [];
+
+    vDocs.forEach(doc => {
+      const statusInfo = calculateDocumentStatus(doc.expiryDate);
+      if (statusInfo.statusType === 'danger') {
+        alerts.push({
+          type: 'danger',
+          title: `${doc.title} Expired`,
+          desc: `Expiry date (${doc.expiryDate}) has passed. Renew immediately to maintain legal compliance.`,
+          tab: 'Documents',
+          path: '/documents'
+        });
+      } else if (statusInfo.statusType === 'warning') {
+        alerts.push({
+          type: 'warning',
+          title: `${doc.title} Expiring Soon`,
+          desc: `Expires on ${doc.expiryDate} (${statusInfo.daysRemaining} days remaining).`,
+          tab: 'Documents',
+          path: '/documents'
+        });
+      }
+    });
+
+    const overdueRems = vRems.filter(r => !r.completed && calculateReminderStatus(r).status === 'Overdue');
+    if (overdueRems.length > 0) {
+      alerts.push({
+        type: 'danger',
+        title: `${overdueRems.length} Overdue Reminder${overdueRems.length > 1 ? 's' : ''}`,
+        desc: `${overdueRems[0].title} is past due date. Mark complete or reschedule.`,
+        tab: 'Reminders',
+        path: '/reminders'
+      });
+    }
+
+    const dueSoonRems = vRems.filter(r => !r.completed && calculateReminderStatus(r).status === 'Due Soon');
+    if (dueSoonRems.length > 0) {
+      alerts.push({
+        type: 'warning',
+        title: `${dueSoonRems.length} Reminder${dueSoonRems.length > 1 ? 's' : ''} Due Soon`,
+        desc: `${dueSoonRems[0].title} scheduled on ${dueSoonRems[0].dueDate}.`,
+        tab: 'Reminders',
+        path: '/reminders'
+      });
+    }
+
+    return alerts;
+  }, [documents, reminders, currentVehicleId]);
 
   const handleQuickDiagnose = (symptomKey) => {
     if (symptomKey) {
@@ -112,6 +173,55 @@ export function DashboardView() {
           <p>Not just a machine, but a trusted partner in every journey.</p>
         </div>
       </section>
+
+      {/* COMPLIANCE & REMINDER ALERTS BANNER */}
+      {complianceAlerts.length > 0 && (
+        <section className="dashboard-alerts-strip" style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {complianceAlerts.map((alert, idx) => (
+            <div 
+              key={idx}
+              className={alert.type === 'danger' ? 'alert-banner-warning' : 'alert-banner-info'}
+              style={{
+                background: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                borderColor: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.35)',
+                color: alert.type === 'danger' ? '#fca5a5' : 'var(--accent-amber)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '12px',
+                padding: '12px 18px',
+                borderRadius: 'var(--radius-md)'
+              }}
+            >
+              <div className="flex-center-gap">
+                {alert.type === 'danger' ? <AlertCircle size={18} style={{ color: '#ef4444', flexShrink: 0 }} /> : <AlertTriangle size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+                <div>
+                  <strong style={{ display: 'block', fontSize: '14px' }}>{alert.title}</strong>
+                  <span style={{ fontSize: '12px', opacity: 0.9 }}>{alert.desc}</span>
+                </div>
+              </div>
+
+              <button
+                className="outline-button"
+                style={{
+                  fontSize: '12px',
+                  padding: '6px 14px',
+                  borderColor: alert.type === 'danger' ? 'rgba(239, 68, 68, 0.4)' : 'rgba(245, 158, 11, 0.4)',
+                  color: 'white',
+                  width: 'auto'
+                }}
+                onClick={() => {
+                  navigate(alert.path);
+                  if (setActiveTab) setActiveTab(alert.tab);
+                }}
+              >
+                View {alert.tab} →
+              </button>
+            </div>
+          ))}
+        </section>
+      )}
 
       {/* 2. KPI METRICS CARDS */}
       <section className="kpi-grid">
