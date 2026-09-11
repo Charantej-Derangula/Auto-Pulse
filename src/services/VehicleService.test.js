@@ -9,16 +9,18 @@ import {
 
 describe('VehicleService - Exact Vehicle Name & Image Matching Engine', () => {
   const REQUIRED_MODELS = [
+    { make: 'Honda', model: 'City', expectedKey: 'honda_city' },
     { make: 'Hyundai', model: 'Creta', expectedKey: 'hyundai_creta' },
     { make: 'Hyundai', model: 'Venue', expectedKey: 'hyundai_venue' },
     { make: 'Tata', model: 'Nexon', expectedKey: 'tata_nexon' },
     { make: 'Mahindra', model: 'XUV700', expectedKey: 'mahindra_xuv700' },
     { make: 'Toyota', model: 'Fortuner', expectedKey: 'toyota_fortuner' },
-    { make: 'Honda', model: 'City', expectedKey: 'honda_city' },
-    { make: 'Toyota', model: 'Innova HyCross', expectedKey: 'toyota_innova hycross' }
+    { make: 'Toyota', model: 'Innova HyCross', expectedKey: 'toyota_innova hycross' },
+    { make: 'Tesla', model: 'Model 3', expectedKey: 'tesla_model 3' },
+    { make: 'Tata', model: 'Nexon EV', expectedKey: 'tata_nexon ev' }
   ];
 
-  it('resolves exact matching verified image for all 7 required vehicles via getVehicleImage(make, model)', () => {
+  it('resolves exact matching verified image for all 9 required vehicles via getVehicleImage(make, model)', () => {
     REQUIRED_MODELS.forEach(({ make, model, expectedKey }) => {
       const img = getVehicleImage(make, model);
       expect(img).toBe(VERIFIED_VEHICLE_IMAGES[expectedKey]);
