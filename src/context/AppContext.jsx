@@ -581,10 +581,20 @@ export const INITIAL_SERVICE_HISTORY = [
 ];
 
 export function AppProvider({ children }) {
-  // Authentication State
+  // Authentication State (defaults to false for first visit, persisted safely with corruption recovery)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const savedAuth = localStorage.getItem('autopulse_auth');
-    return savedAuth !== null ? JSON.parse(savedAuth) : true;
+    try {
+      const localAuth = localStorage.getItem('autopulse_auth');
+      const sessionAuth = sessionStorage.getItem('autopulse_auth');
+      const val = localAuth !== null ? localAuth : sessionAuth;
+      if (val === null) return false;
+      return JSON.parse(val) === true;
+    } catch (e) {
+      console.warn('[AppContext] Malformed auth storage, resetting to unauthenticated:', e);
+      localStorage.removeItem('autopulse_auth');
+      sessionStorage.removeItem('autopulse_auth');
+      return false;
+    }
   });
 
   // User Profile State
@@ -732,8 +742,14 @@ export function AppProvider({ children }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Sync to localStorage (preserves both garage_vehicle and autopulse_vehicle)
+  // Persistent auth state synced in login/logout handlers
   useEffect(() => {
-    localStorage.setItem('autopulse_auth', JSON.stringify(isAuthenticated));
+    if (!isAuthenticated) {
+      try {
+        localStorage.removeItem('autopulse_auth');
+        sessionStorage.removeItem('autopulse_auth');
+      } catch (e) {}
+    }
   }, [isAuthenticated]);
 
   useEffect(() => {
@@ -849,8 +865,19 @@ export function AppProvider({ children }) {
     });
   };
 
-  const login = (userData) => {
+  const login = (userData, remember = true) => {
     setIsAuthenticated(true);
+    try {
+      if (remember) {
+        localStorage.setItem('autopulse_auth', JSON.stringify(true));
+        sessionStorage.removeItem('autopulse_auth');
+      } else {
+        sessionStorage.setItem('autopulse_auth', JSON.stringify(true));
+        localStorage.removeItem('autopulse_auth');
+      }
+    } catch (e) {
+      console.warn('[AppContext] Storage error during login:', e);
+    }
     if (userData?.name) {
       updateUser(userData);
     }
@@ -859,6 +886,10 @@ export function AppProvider({ children }) {
 
   const logout = () => {
     setIsAuthenticated(false);
+    try {
+      localStorage.removeItem('autopulse_auth');
+      sessionStorage.removeItem('autopulse_auth');
+    } catch (e) {}
     setActiveTab('Dashboard');
   };
 

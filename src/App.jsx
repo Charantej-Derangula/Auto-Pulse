@@ -50,8 +50,11 @@ function MainAppContent() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardView />} />
             <Route path="/vehicle" element={<MyVehicleView />} />
+            <Route path="/my-vehicle" element={<MyVehicleView />} />
             <Route path="/diagnose" element={<DiagnoseIssueView />} />
+            <Route path="/diagnose-issue" element={<DiagnoseIssueView />} />
             <Route path="/maintenance" element={<ServiceMaintenanceView />} />
+            <Route path="/service-maintenance" element={<ServiceMaintenanceView />} />
             <Route path="/fuel-expenses" element={<FuelExpensesView />} />
             <Route path="/documents" element={<DocumentsView />} />
             <Route path="/reminders" element={<RemindersView />} />

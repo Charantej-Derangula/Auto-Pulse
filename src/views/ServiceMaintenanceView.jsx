@@ -14,9 +14,13 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { VehicleHealthModal } from '../components/VehicleHealthModal';
+import { useNavigate } from 'react-router-dom';
 
 export function ServiceMaintenanceView() {
-  const { vehicle, setActiveTab } = useApp();
+  const navigate = useNavigate();
+  const { vehicle, setActiveTab, vehicleHealth } = useApp();
+  const [selectedComp, setSelectedComp] = useState(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [selectedServiceType, setSelectedServiceType] = useState('50,000 km Major General Service');
 
@@ -55,6 +59,23 @@ export function ServiceMaintenanceView() {
       isNext: false
     }
   ];
+
+    // Synchronize components from live vehicleHealth intelligence with fallback
+  const displayComponentChecks = (vehicleHealth?.components && vehicleHealth.components.length > 0)
+    ? vehicleHealth.components.map(c => ({
+        id: c.id,
+        name: c.name,
+        health: c.score,
+        status: c.status,
+        type: c.systemType || "Automotive Subsystem",
+        ok: c.score >= 75,
+        statusColor: c.statusColor,
+        reason: c.reason,
+        recommendedAction: c.recommendedAction,
+        lastChecked: c.lastChecked,
+        priority: c.priority
+      }))
+    : componentChecks;
 
   const handleBookService = () => {
     setBookingSuccess(true);
@@ -147,32 +168,44 @@ export function ServiceMaintenanceView() {
           </div>
 
           <div className="component-checks-list">
-            {componentChecks.map((comp, idx) => (
-              <div key={idx} className="comp-check-item">
-                <div className="comp-check-header">
-                  <div>
-                    <strong>{comp.name}</strong>
-                    <span className="comp-sub">{comp.type}</span>
+            {displayComponentChecks.map((comp, idx) => {
+              const score = comp.health ?? 90;
+              const color = comp.statusColor || (score >= 90 ? "#2de28a" : score >= 75 ? "#38a8ff" : score >= 60 ? "#f59e0b" : "#ef4444");
+              return (
+                <div 
+                  key={idx} 
+                  className="comp-check-item interactive-health-card"
+                  onClick={() => setSelectedComp(comp)}
+                  title={`Click to view ${comp.name} diagnostics & recommendations`}
+                  style={{ cursor: "pointer", transition: "all 0.2s ease" }}
+                >
+                  <div className="comp-check-header">
+                    <div>
+                      <strong>{comp.name}</strong>
+                      <span className="comp-sub">{comp.type}</span>
+                    </div>
+                    <span className="comp-pct" style={{ color }}>{score}%</span>
                   </div>
-                  <span className="comp-pct">{comp.health}%</span>
-                </div>
 
-                <div className="subsystem-bar">
-                  <div 
-                    className="subsystem-fill" 
-                    style={{ 
-                      width: `${comp.health}%`,
-                      backgroundColor: comp.health > 80 ? '#2de28a' : '#f59e0b'
-                    }}
-                  ></div>
-                </div>
+                  <div className="subsystem-bar">
+                    <div 
+                      className="subsystem-fill" 
+                      style={{ 
+                        width: `${score}%`,
+                        backgroundColor: color
+                      }}
+                    ></div>
+                  </div>
 
-                <div className="comp-status-row">
-                  <span className="text-muted">{comp.status}</span>
-                  <CheckCircle2 size={15} className="text-emerald" />
+                  <div className="comp-status-row">
+                    <span className="text-muted">{comp.status}</span>
+                    <span style={{ fontSize: "11px", color: "var(--accent-blue)", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                      Details →
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

@@ -184,6 +184,7 @@ export function Header() {
                 onClick={() => {
                   setIsProfileDropdownOpen(false);
                   logout();
+                  navigate('/login', { replace: true });
                 }}
               >
                 <LogOut size={16} />

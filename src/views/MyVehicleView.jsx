@@ -16,12 +16,14 @@ import {
   Plus
 } from 'lucide-react';
 import { useApp, DEMO_VEHICLES } from '../context/AppContext';
+import { VehicleHealthModal } from '../components/VehicleHealthModal';
 
 export function MyVehicleView() {
-  const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError } = useApp();
+  const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError, vehicleHealth } = useApp();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(vehicle || DEMO_VEHICLES[0]);
   const [savedAlert, setSavedAlert] = useState(false);
+  const [selectedHealthSub, setSelectedHealthSub] = useState(null);
 
   const handleSelectDemo = async (e) => {
     const selected = DEMO_VEHICLES.find(v => v.model === e.target.value);
@@ -239,7 +241,7 @@ export function MyVehicleView() {
               <p className="v-hero-variant">{vehicle?.variant}</p>
             </div>
             <div className="v-health-circle-badge">
-              <strong>{vehicle?.healthScore || 94}%</strong>
+              <strong>{vehicleHealth?.overallScore || vehicle?.healthScore || 94}%</strong>
               <small>Health Score</small>
             </div>
           </div>
@@ -301,24 +303,44 @@ export function MyVehicleView() {
           </div>
 
           <div className="subsystems-detail-list">
-            {vehicle?.subsystems && Object.entries(vehicle.subsystems).map(([key, sub]) => (
-              <div key={key} className="subsystem-detail-row">
-                <div className="sub-row-top">
-                  <strong>{sub.name}</strong>
-                  <span className="sub-health-pct">{sub.health}%</span>
+            {(vehicleHealth?.subsystems || vehicle?.subsystems) && Object.entries(vehicleHealth?.subsystems || vehicle.subsystems).map(([key, sub]) => {
+              const score = sub.score ?? sub.health ?? 90;
+              const statusColor = score >= 90 ? "#2de28a" : score >= 75 ? "#38a8ff" : score >= 60 ? "#f59e0b" : "#ef4444";
+              return (
+                <div 
+                  key={key} 
+                  className="subsystem-detail-row"
+                  onClick={() => setSelectedHealthSub(sub)}
+                  title={`Click to view ${sub.name} diagnostics & recommendations`}
+                  style={{ 
+                    cursor: "pointer",
+                    padding: "8px 10px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "rgba(255, 255, 255, 0.015)",
+                    border: "1px solid rgba(255, 255, 255, 0.05)",
+                    transition: "all 0.2s ease"
+                  }}
+                >
+                  <div className="sub-row-top">
+                    <strong style={{ fontSize: "13px" }}>{sub.name}</strong>
+                    <span className="sub-health-pct" style={{ color: statusColor, fontWeight: "700" }}>{score}%</span>
+                  </div>
+                  <div className="subsystem-bar" style={{ margin: "5px 0" }}>
+                    <div 
+                      className="subsystem-fill" 
+                      style={{ 
+                        width: `${score}%`, 
+                        backgroundColor: statusColor
+                      }}
+                    ></div>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <small className="text-muted" style={{ fontSize: "11px" }}>{sub.status}</small>
+                    <small style={{ fontSize: "10px", color: "var(--accent-blue)", opacity: 0.85 }}>View Details →</small>
+                  </div>
                 </div>
-                <div className="subsystem-bar">
-                  <div 
-                    className="subsystem-fill" 
-                    style={{ 
-                      width: `${sub.health}%`,
-                      backgroundColor: sub.health > 85 ? '#2de28a' : '#f59e0b'
-                    }}
-                  ></div>
-                </div>
-                <small className="text-muted">{sub.status}</small>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

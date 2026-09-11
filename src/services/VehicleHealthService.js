@@ -18,48 +18,33 @@ function normalizeSubsystems(components, defaultSubsystems = {}) {
 
   components.forEach(comp => {
     const key = comp.id?.toLowerCase();
+    const itemData = {
+      id: comp.id,
+      name: comp.name,
+      health: comp.score,
+      score: comp.score,
+      status: comp.status || (comp.score >= 90 ? 'Optimal' : comp.score >= 75 ? 'Good' : comp.score >= 60 ? 'Attention Required' : 'Critical'),
+      statusColor: comp.statusColor || (comp.score >= 90 ? '#2de28a' : comp.score >= 75 ? '#38a8ff' : comp.score >= 60 ? '#f59e0b' : '#ef4444'),
+      priority: comp.priority || (comp.score < 60 ? 'High' : comp.score < 80 ? 'Medium' : 'Low'),
+      icon: comp.icon,
+      reason: comp.reason || 'Normal operational telemetry.',
+      recommendedAction: comp.recommendedAction || 'Inspect at next service interval.',
+      lastChecked: comp.lastChecked || 'Periodic CAN-Bus diagnostic scan',
+      systemType: comp.systemType || comp.name
+    };
+
     if (key.includes('engine') || key.includes('motor')) {
-      result.engine = {
-        name: comp.name || 'Engine / Powertrain',
-        health: comp.score,
-        status: comp.status || 'Optimal',
-        priority: comp.priority
-      };
+      result.engine = { ...result.engine, ...itemData, name: comp.name || 'Engine / Powertrain' };
     } else if (key.includes('battery')) {
-      result.battery = {
-        name: comp.name || '12V Starter Battery',
-        health: comp.score,
-        status: comp.status || 'Good',
-        priority: comp.priority
-      };
+      result.battery = { ...result.battery, ...itemData, name: comp.name || '12V Starter Battery' };
     } else if (key.includes('brake')) {
-      result.brakes = {
-        name: comp.name || 'Brake Pads & Rotors',
-        health: comp.score,
-        status: comp.status || 'Good',
-        priority: comp.priority
-      };
+      result.brakes = { ...result.brakes, ...itemData, name: comp.name || 'Brake Pads & Rotors' };
     } else if (key.includes('tyre') || key.includes('tire')) {
-      result.tyres = {
-        name: comp.name || 'Tyre Tread Life',
-        health: comp.score,
-        status: comp.status || 'Good',
-        priority: comp.priority
-      };
+      result.tyres = { ...result.tyres, ...itemData, name: comp.name || 'Tyre Tread Life' };
     } else if (key.includes('fluid')) {
-      result.fluids = {
-        name: comp.name || 'Fluids & Coolants',
-        health: comp.score,
-        status: comp.status || 'Optimal',
-        priority: comp.priority
-      };
+      result.fluids = { ...result.fluids, ...itemData, name: comp.name || 'Fluids & Coolants' };
     } else if (key.includes('electric')) {
-      result.electrical = {
-        name: comp.name || 'Electrical & CAN-Bus',
-        health: comp.score,
-        status: comp.status || 'Optimal',
-        priority: comp.priority
-      };
+      result.electrical = { ...result.electrical, ...itemData, name: comp.name || 'Electrical & CAN-Bus' };
     }
   });
 

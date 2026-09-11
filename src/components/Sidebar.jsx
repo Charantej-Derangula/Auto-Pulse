@@ -71,7 +71,11 @@ export function Sidebar() {
         <nav className="sidebar-nav">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = location.pathname === item.path;
+            const currentPath = location.pathname;
+            const isActive = currentPath === item.path || 
+              (item.path === '/vehicle' && currentPath === '/my-vehicle') ||
+              (item.path === '/diagnose' && currentPath === '/diagnose-issue') ||
+              (item.path === '/maintenance' && currentPath === '/service-maintenance');
             return (
               <button
                 key={item.id}

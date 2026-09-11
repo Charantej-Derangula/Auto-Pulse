@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { VehicleHealthModal } from '../components/VehicleHealthModal';
 
 export function DashboardView() {
   const navigate = useNavigate();
@@ -530,24 +531,39 @@ export function DashboardView() {
 
           <div className="subsystems-grid">
             {(vehicleHealth?.subsystems || vehicle?.subsystems) ? (
-              Object.entries(vehicleHealth?.subsystems || vehicle.subsystems).map(([key, item]) => (
-                <div key={key} className="subsystem-card">
-                  <div className="subsystem-top">
-                    <strong>{item.name}</strong>
-                    <span className="subsystem-val">{item.health}%</span>
+              Object.entries(vehicleHealth?.subsystems || vehicle.subsystems).map(([key, item]) => {
+                const score = item.score ?? item.health ?? 90;
+                const statusColor = score >= 90 ? '#2de28a' : score >= 75 ? '#38a8ff' : score >= 60 ? '#f59e0b' : '#ef4444';
+                return (
+                  <div 
+                    key={key} 
+                    className="subsystem-card interactive-health-card"
+                    onClick={() => setSelectedHealthComp(item)}
+                    title={`Click to view ${item.name} diagnostics & recommendations`}
+                    style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
+                  >
+                    <div className="subsystem-top">
+                      <strong>{item.name}</strong>
+                      <span className="subsystem-val" style={{ color: statusColor, fontWeight: '700' }}>
+                        {score}%
+                      </span>
+                    </div>
+                    <div className="subsystem-bar">
+                      <div 
+                        className="subsystem-fill" 
+                        style={{ 
+                          width: `${score}%`,
+                          backgroundColor: statusColor
+                        }}
+                      ></div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <small className="subsystem-stat-label">{item.status}</small>
+                      <small style={{ fontSize: '10px', color: 'var(--accent-blue)', opacity: 0.85 }}>Details →</small>
+                    </div>
                   </div>
-                  <div className="subsystem-bar">
-                    <div 
-                      className="subsystem-fill" 
-                      style={{ 
-                        width: `${item.health}%`,
-                        backgroundColor: item.health > 85 ? '#2de28a' : item.health > 70 ? '#f59e0b' : '#ef4444'
-                      }}
-                    ></div>
-                  </div>
-                  <small className="subsystem-stat-label">{item.status}</small>
-                </div>
-              ))
+                );
+              })
             ) : (
               <p>Vehicle telemetry unavailable</p>
             )}
@@ -581,6 +597,19 @@ export function DashboardView() {
           </div>
         </div>
       </section>
+
+      {/* INTERACTIVE HEALTH DETAIL MODAL */}
+      {selectedHealthComp && (
+        <VehicleHealthModal
+          item={selectedHealthComp}
+          overallHealth={vehicleHealth}
+          onClose={() => setSelectedHealthComp(null)}
+          onNavigateService={() => {
+            navigate('/maintenance');
+            if (setActiveTab) setActiveTab('Service & Maintenance');
+          }}
+        />
+      )}
     </div>
   );
 }
