@@ -14,8 +14,10 @@ import {
   Key
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 export function SettingsView() {
+  const navigate = useNavigate();
   const { user, updateUser, logout } = useApp();
 
   const [formData, setFormData] = useState({
@@ -225,7 +227,10 @@ export function SettingsView() {
               <button 
                 type="button" 
                 className="logout-action-btn flex-center-gap"
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  navigate('/login', { replace: true });
+                }}
               >
                 <LogOut size={16} />
                 <span>Sign Out of Auto Pulse</span>
