@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4EFE6" />
+      <stop offset="100%" stop-color="#E9E1D3" />
+    </linearGradient>
+    <linearGradient id="carGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8A92A6" />
+      <stop offset="100%" stop-color="#64748B" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bgGrad)" rx="16" />
+  <g transform="translate(160, 80) scale(1.05)">
+    <path d="M40,140 Q60,140 80,120 L130,70 Q160,40 220,40 L280,40 Q330,40 360,70 L390,110 Q420,115 440,130 Q450,140 450,160 L450,180 Q450,190 430,190 L400,190 Q390,160 360,160 Q330,160 320,190 L160,190 Q150,160 120,160 Q90,160 80,190 L30,190 Q20,190 20,170 Q20,140 40,140 Z" fill="url(#carGrad)" opacity="0.6" />
+    <circle cx="120" cy="190" r="30" fill="#475569" />
+    <circle cx="120" cy="190" r="15" fill="#CBD5E1" />
+    <circle cx="360" cy="190" r="30" fill="#475569" />
+    <circle cx="360" cy="190" r="15" fill="#CBD5E1" />
+    <path d="M140,115 L180,60 L235,60 L235,115 Z" fill="#F1F5F9" opacity="0.85" />
+    <path d="M245,60 L310,60 L345,115 L245,115 Z" fill="#F1F5F9" opacity="0.85" />
+  </g>
+  <text x="400" y="350" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="22" font-weight="700" fill="#172033" text-anchor="middle" letter-spacing="0.5">
+    Vehicle image unavailable
+  </text>
+  <text x="400" y="380" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="14" font-weight="500" fill="#667085" text-anchor="middle">
+    AutoPulse Verified Telemetry Engine
+  </text>
+</svg>

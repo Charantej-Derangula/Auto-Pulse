@@ -11,6 +11,7 @@ import {
   Zap,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   FileText,
   Wrench,
   RefreshCw,
@@ -20,12 +21,14 @@ import { useApp, DEMO_VEHICLES } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
 import { calculateDocumentStatus } from '../services/DocumentService';
 import { getVehicleImage, NEUTRAL_VEHICLE_FALLBACK } from '../services/VehicleService';
+import { VehicleSetupView } from './VehicleSetupView';
 
 export function MyVehicleView() {
   const navigate = useNavigate();
   const { vehicle, setVehicle, setActiveTab, isVehicleLoading, vehicleError, setVehicleError, vehicleHealth, documents } = useApp();
+
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(vehicle || DEMO_VEHICLES[0]);
+  const [formData, setFormData] = useState(vehicle);
   const [savedAlert, setSavedAlert] = useState(false);
   const [selectedHealthSub, setSelectedHealthSub] = useState(null);
 
@@ -35,6 +38,10 @@ export function MyVehicleView() {
       setFormData(vehicle);
     }
   }, [vehicle]);
+
+  if (!vehicle) {
+    return <VehicleSetupView />;
+  }
 
   const handleSelectDemo = async (e) => {
     const selected = DEMO_VEHICLES.find(v => v.id === e.target.value || v.model === e.target.value);
@@ -259,7 +266,7 @@ export function MyVehicleView() {
             </div>
             <div className="v-health-circle-badge">
               <strong>{vehicleHealth?.overallScore || vehicle?.healthScore || 94}%</strong>
-              <small>Health Score</small>
+              <small>Estimated Health</small>
             </div>
           </div>
 

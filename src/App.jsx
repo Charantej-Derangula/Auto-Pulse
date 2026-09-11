@@ -17,6 +17,7 @@ import { RemindersView } from './views/RemindersView';
 import { ServiceHistoryView } from './views/ServiceHistoryView';
 import { FindGarageView } from './views/FindGarageView';
 import { SettingsView } from './views/SettingsView';
+import { VehicleSetupView } from './views/VehicleSetupView';
 import { NotFoundView } from './views/NotFoundView';
 
 import './App.css';
@@ -51,6 +52,8 @@ function MainAppContent() {
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardView />} />
+            <Route path="/vehicle-setup" element={<VehicleSetupView />} />
+            <Route path="/setup-vehicle" element={<VehicleSetupView />} />
             <Route path="/vehicle" element={<MyVehicleView />} />
             <Route path="/my-vehicle" element={<MyVehicleView />} />
             <Route path="/diagnose" element={<DiagnoseIssueView />} />

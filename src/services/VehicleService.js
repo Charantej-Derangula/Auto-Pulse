@@ -20,7 +20,7 @@
  * 5. Safe error handling: API failures or network timeouts never crash React, cause blank pages, or change vehicleId.
  */
 
-const STORAGE_CACHE_KEY = 'autopulse_vehicle_image_cache_v3';
+const STORAGE_CACHE_KEY = 'autopulse_vehicle_image_cache_v5';
 
 // In-memory cache synced with localStorage
 const memoryCache = new Map();
@@ -63,53 +63,73 @@ function getCachedImage(key) {
   return memoryCache.get(key) || null;
 }
 
-// High-fidelity verified static matching images for exact model resolution (100% unique per model)
-export const VERIFIED_VEHICLE_IMAGES = {
-  // 1. Honda City (Modern Japanese Sedan)
-  'honda_city': 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=1200&q=80',
-  'honda_civic': 'https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=1200&q=80',
-  'honda_accord': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80',
+// Neutral Auto Pulse vehicle fallback SVG (displays "Vehicle image unavailable" with clean automotive silhouette)
+export const NEUTRAL_VEHICLE_FALLBACK = '/vehicles/neutral_placeholder.svg';
 
-  // 2. Hyundai Creta (Modern Compact SUV)
-  'hyundai_creta': 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
-  // 3. Hyundai Venue (Subcompact Urban Crossover)
-  'hyundai_venue': 'https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1200&q=80',
-  'hyundai_verna': 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80',
-  'hyundai_tucson': 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-  'hyundai_ioniq': 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80',
-
-  // 4. Tata Nexon (Sporty Coupe Crossover)
-  'tata_nexon': 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-  // 9. Tata Nexon EV (Distinct Electric Crossover)
-  'tata_nexon ev': 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80',
-  'tata_harrier': 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-  'tata_safari': 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1200&q=80',
-
-  // 5. Mahindra XUV700 (Bold Muscular 7-Seater Luxury SUV)
-  'mahindra_xuv700': 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=80',
-  'mahindra_thar': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
-  'mahindra_scorpio': 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80',
-
-  // 6. Toyota Fortuner (Rugged 4x4 Full-Size SUV)
-  'toyota_fortuner': 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
-  // 7. Toyota Innova HyCross (Executive Luxury MPV Crossover)
-  'toyota_innova hycross': 'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=80',
-  'toyota_innova': 'https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=80',
-  'toyota_camry': 'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&w=1200&q=80',
-
-  // 8. Tesla Model 3 (Aerodynamic Pure EV Sedan)
-  'tesla_model 3': 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=1200&q=80',
-  'tesla_model y': 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=1200&q=80',
-  'tesla_model s': 'https://images.unsplash.com/photo-1536700503339-1e4b06520771?auto=format&fit=crop&w=1200&q=80',
-
-  // German / Luxury
-  'bmw_3 series': 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
-  'mercedes-benz_c-class': 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80',
-  'audi_a4': 'https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80'
+// Centralized Vehicle Images mapping using local verified assets
+export const VEHICLE_IMAGES = {
+  "Honda City": "/assets/vehicles/honda-city.jpg",
+  "Hyundai Creta": "/assets/vehicles/hyundai-creta.jpg",
+  "Hyundai Venue": "/assets/vehicles/hyundai-venue.jpg",
+  "Tata Nexon": "/assets/vehicles/tata-nexon.jpg",
+  "Mahindra XUV700": "/assets/vehicles/mahindra-xuv700.png",
+  "Toyota Fortuner": "/assets/vehicles/toyota-fortuner.jpg",
+  "Toyota Innova HyCross": "/assets/vehicles/toyota-innova-hycross.jpg",
+  "Tesla Model 3": "/assets/vehicles/tesla-model-3.jpg",
+  "Tata Nexon EV": "/assets/vehicles/tata-nexon-ev.jpg"
 };
 
-// Neutral Auto Pulse vehicle fallback SVG / Image (never shows a misleading car)
-export const NEUTRAL_VEHICLE_FALLBACK = 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80';
+// High-fidelity verified exact vehicle images (100% genuine vehicle photos matching exact make + model)
+export const VERIFIED_VEHICLE_IMAGES = {
+  // 1. Honda City (Modern 4-Door Sedan)
+  'honda_city': '/assets/vehicles/honda-city.jpg',
+  'honda city': '/assets/vehicles/honda-city.jpg',
+  'honda_civic': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/2022_Honda_Civic_Sport_Sedan%2C_front_left%2C_10-09-2022.jpg/1200px-2022_Honda_Civic_Sport_Sedan%2C_front_left%2C_10-09-2022.jpg',
+  'honda_accord': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/2018_Honda_Accord_Touring_2.0T%2C_front_10.23.19.jpg/1200px-2018_Honda_Accord_Touring_2.0T%2C_front_10.23.19.jpg',
+
+  // 2. Hyundai Creta (Compact SUV)
+  'hyundai_creta': '/assets/vehicles/hyundai-creta.jpg',
+  'hyundai creta': '/assets/vehicles/hyundai-creta.jpg',
+  // 3. Hyundai Venue (Subcompact Urban Crossover)
+  'hyundai_venue': '/assets/vehicles/hyundai-venue.jpg',
+  'hyundai venue': '/assets/vehicles/hyundai-venue.jpg',
+  'hyundai_verna': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Hyundai_Verna_BN7_IMG_9771.jpg/1200px-Hyundai_Verna_BN7_IMG_9771.jpg',
+  'hyundai_tucson': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2022_Hyundai_Tucson_SEL%2C_front_1.24.22.jpg/1200px-2022_Hyundai_Tucson_SEL%2C_front_1.24.22.jpg',
+  'hyundai_ioniq': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/2022_Hyundai_Ioniq_5_Htrac_front_right_view.jpg/1200px-2022_Hyundai_Ioniq_5_Htrac_front_right_view.jpg',
+
+  // 4. Tata Nexon (Sporty Coupe Crossover)
+  'tata_nexon': '/assets/vehicles/tata-nexon.jpg',
+  'tata nexon': '/assets/vehicles/tata-nexon.jpg',
+  // 9. Tata Nexon EV (Electric Crossover)
+  'tata_nexon ev': '/assets/vehicles/tata-nexon-ev.jpg',
+  'tata_nexon_ev': '/assets/vehicles/tata-nexon-ev.jpg',
+  'tata nexon ev': '/assets/vehicles/tata-nexon-ev.jpg',
+  'tata_harrier': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Tata_Harrier_Fearless_Plus_%28India%29_front_view.jpg/1200px-Tata_Harrier_Fearless_Plus_%28India%29_front_view.jpg',
+  'tata_safari': 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/2021_Tata_Safari_XTA%2B_%28India%29_front_view.jpg/1200px-2021_Tata_Safari_XTA%2B_%28India%29_front_view.jpg',
+
+  // 5. Mahindra XUV700 (7-Seater Luxury SUV)
+  'mahindra_xuv700': '/assets/vehicles/mahindra-xuv700.png',
+  'mahindra xuv700': '/assets/vehicles/mahindra-xuv700.png',
+  'mahindra_thar': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/2020_Mahindra_Thar_Hard_Top_LX_%28India%29_front_view.jpg/1200px-2020_Mahindra_Thar_Hard_Top_LX_%28India%29_front_view.jpg',
+  'mahindra_scorpio': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/2022_Mahindra_Scorpio-N_Z8L_4XPLOR_%28India%29_front_view.jpg/1200px-2022_Mahindra_Scorpio-N_Z8L_4XPLOR_%28India%29_front_view.jpg',
+
+  // 6. Toyota Fortuner (Rugged 4x4 Full-Size SUV)
+  'toyota_fortuner': '/assets/vehicles/toyota-fortuner.jpg',
+  'toyota fortuner': '/assets/vehicles/toyota-fortuner.jpg',
+  // 7. Toyota Innova HyCross (Executive Luxury Hybrid MPV)
+  'toyota_innova hycross': '/assets/vehicles/toyota-innova-hycross.jpg',
+  'toyota_innova_hycross': '/assets/vehicles/toyota-innova-hycross.jpg',
+  'toyota innova hycross': '/assets/vehicles/toyota-innova-hycross.jpg',
+  'toyota_innova': '/assets/vehicles/toyota-innova-hycross.jpg',
+  'toyota_camry': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/2018_Toyota_Camry_%28ASV70R%29_Ascent_sedan_%282018-08-27%29_01.jpg/1200px-2018_Toyota_Camry_%28ASV70R%29_Ascent_sedan_%282018-08-27%29_01.jpg',
+
+  // 8. Tesla Model 3 (Aerodynamic Pure EV Sedan)
+  'tesla_model 3': '/assets/vehicles/tesla-model-3.jpg',
+  'tesla_model_3': '/assets/vehicles/tesla-model-3.jpg',
+  'tesla model 3': '/assets/vehicles/tesla-model-3.jpg',
+  'tesla_model y': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/2020_Tesla_Model_Y_Long_Range_Dual_Motor%2C_front_10.23.20.jpg/1200px-2020_Tesla_Model_Y_Long_Range_Dual_Motor%2C_front_10.23.20.jpg',
+  'tesla_model s': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/2018_Tesla_Model_S_75D%2C_front_10.20.19.jpg/1200px-2018_Tesla_Model_S_75D%2C_front_10.20.19.jpg'
+};
 
 /**
  * Query external vehicle image API using environment variables VITE_VEHICLE_IMAGE_API_URL and VITE_VEHICLE_IMAGE_API_KEY
@@ -194,6 +214,18 @@ export function getVehicleImage(vehicleOrMake, optionalModel = '') {
     make = vehicleOrMake.manufacturer || vehicleOrMake.make || '';
     model = vehicleOrMake.model || '';
   } else if (typeof vehicleOrMake === 'string') {
+    const trimmedInput = vehicleOrMake.trim();
+    // Direct lookup in VEHICLE_IMAGES (e.g. "Honda City")
+    if (!optionalModel) {
+      if (VEHICLE_IMAGES[trimmedInput]) {
+        return VEHICLE_IMAGES[trimmedInput];
+      }
+      for (const [name, path] of Object.entries(VEHICLE_IMAGES)) {
+        if (name.toLowerCase() === trimmedInput.toLowerCase()) {
+          return path;
+        }
+      }
+    }
     make = vehicleOrMake;
     model = optionalModel || '';
   }
@@ -203,6 +235,14 @@ export function getVehicleImage(vehicleOrMake, optionalModel = '') {
 
   if (!cleanMake && !cleanModel) {
     return NEUTRAL_VEHICLE_FALLBACK;
+  }
+
+  // Check matching key in VEHICLE_IMAGES
+  const combinedName = `${make.trim()} ${model.trim()}`.trim().toLowerCase();
+  for (const [name, path] of Object.entries(VEHICLE_IMAGES)) {
+    if (name.toLowerCase() === combinedName) {
+      return path;
+    }
   }
 
   const exactKey = `${cleanMake}_${cleanModel}`;
@@ -223,7 +263,9 @@ export function getVehicleImage(vehicleOrMake, optionalModel = '') {
   // (e.g. "tata_nexon ev" is evaluated before "tata_nexon")
   const sortedEntries = Object.entries(VERIFIED_VEHICLE_IMAGES).sort((a, b) => b[0].length - a[0].length);
   for (const [key, val] of sortedEntries) {
+    if (!key.includes('_')) continue;
     const [keyMake, keyModel] = key.split('_');
+    if (!keyMake || !keyModel) continue;
     const makeMatches = cleanMake.includes(keyMake) || keyMake.includes(cleanMake);
     const modelMatches = cleanModel.includes(keyModel) || keyModel.includes(cleanModel);
     
@@ -296,10 +338,11 @@ export function buildVehicleObject(data, resolvedImage = null) {
   const cleanModelSlug = model.toLowerCase().replace(/[^a-z0-9]/g, '-');
   const stableId = data?.id || data?.vehicleId || `${cleanMakeSlug}-${cleanModelSlug}`;
 
-  // Use centralized resolver for guaranteed exact matching
-  const exactImage = resolvedImage || getVehicleImage({ manufacturer, model });
+  // Always use centralized resolver for guaranteed exact matching (prevents stale/wrong image carryover)
+  const exactImage = getVehicleImage({ manufacturer, model }) || resolvedImage || NEUTRAL_VEHICLE_FALLBACK;
 
   return {
+    ...data,
     id: stableId,
     vehicleId: stableId,
     manufacturer,

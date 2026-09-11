@@ -168,7 +168,7 @@ export function VehicleHealthModal({ item, overallHealth, onClose, onNavigateSer
           gap: '12px'
         }}>
           <span style={{ fontSize: '12px', color: 'var(--text-dim)' }}>
-            CAN-Bus Telemetry v2.5
+            Estimated Health Telemetry v2.5
           </span>
           <div style={{ display: 'flex', gap: '10px' }}>
             <button 

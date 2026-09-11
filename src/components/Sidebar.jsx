@@ -22,12 +22,12 @@ export function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
-  const vehicleDocCount = Array.isArray(documents) 
-    ? documents.filter(d => (d.vehicleId === currentVehicleId || (!d.vehicleId && currentVehicleId === 'honda-city'))).length 
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || null;
+  const vehicleDocCount = Array.isArray(documents) && currentVehicleId
+    ? documents.filter(d => d.vehicleId === currentVehicleId).length 
     : 0;
-  const vehiclePendingRemindersCount = Array.isArray(reminders)
-    ? reminders.filter(r => (r.vehicleId === currentVehicleId || (!r.vehicleId && currentVehicleId === 'honda-city')) && !r.completed).length
+  const vehiclePendingRemindersCount = Array.isArray(reminders) && currentVehicleId
+    ? reminders.filter(r => r.vehicleId === currentVehicleId && !r.completed).length
     : 0;
 
   const navItems = [
@@ -105,13 +105,23 @@ export function Sidebar() {
         </nav>
 
         {/* Pro Active Vehicle Widget in Sidebar */}
-        <div className="sidebar-vehicle-pill" onClick={() => handleNavigation('/vehicle', 'My Vehicle')}>
-          <div className="vehicle-mini-status">
-            <span className="pulse-dot"></span>
-            <strong>{vehicle?.manufacturer} {vehicle?.model}</strong>
+        {vehicle ? (
+          <div className="sidebar-vehicle-pill" onClick={() => handleNavigation('/vehicle', 'My Vehicle')}>
+            <div className="vehicle-mini-status">
+              <span className="pulse-dot"></span>
+              <strong>{vehicle.displayName || `${vehicle.manufacturer} ${vehicle.model}`}</strong>
+            </div>
+            <span className="vehicle-mini-sub">{vehicle.odometer ? `${vehicle.odometer.toLocaleString()} km • ` : ''}{vehicle.healthScore || 95}% Health</span>
           </div>
-          <span className="vehicle-mini-sub">{vehicle?.odometer?.toLocaleString()} km • {vehicle?.healthScore || 94}% Health</span>
-        </div>
+        ) : (
+          <div className="sidebar-vehicle-pill" onClick={() => handleNavigation('/dashboard', 'Dashboard')} style={{ borderColor: 'var(--accent-blue)', background: 'rgba(23, 105, 224, 0.05)' }}>
+            <div className="vehicle-mini-status">
+              <span className="pulse-dot" style={{ background: 'var(--accent-blue)' }}></span>
+              <strong style={{ color: 'var(--accent-blue)' }}>+ Add Your Vehicle</strong>
+            </div>
+            <span className="vehicle-mini-sub">Setup garage profile</span>
+          </div>
+        )}
 
         {/* Footer Quote */}
         <div className="sidebar-quote">

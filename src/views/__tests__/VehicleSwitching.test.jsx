@@ -86,4 +86,78 @@ describe('Vehicle Preset & Image Synchronization Regression Suite', () => {
     const unique = new Set(urls);
     expect(unique.size).toBe(9);
   });
+
+  it('verifies dynamic vehicle editing replaces the old image and name with the new model', () => {
+    // 1. Initial State: Hyundai Creta
+    const creta = DEMO_VEHICLES.find(d => d.id === 'hyundai-creta');
+    localStorage.setItem('garage_vehicle', JSON.stringify(creta));
+
+    let html = renderToString(
+      <AppProvider>
+        <MemoryRouter>
+          <DashboardView />
+        </MemoryRouter>
+      </AppProvider>
+    );
+
+    const cretaUrlEncoded = VERIFIED_VEHICLE_IMAGES['hyundai_creta'].replace(/&/g, '&amp;');
+    expect(html).toContain(cretaUrlEncoded);
+    expect(html).toContain('Hyundai Creta');
+
+    // 2. Dynamic Edit to Toyota Fortuner
+    const fortuner = DEMO_VEHICLES.find(d => d.id === 'toyota-fortuner');
+    localStorage.setItem('garage_vehicle', JSON.stringify(fortuner));
+
+    html = renderToString(
+      <AppProvider>
+        <MemoryRouter>
+          <DashboardView />
+        </MemoryRouter>
+      </AppProvider>
+    );
+
+    const fortunerUrlEncoded = VERIFIED_VEHICLE_IMAGES['toyota_fortuner'].replace(/&/g, '&amp;');
+    expect(html).toContain(fortunerUrlEncoded);
+    expect(html).toContain('Toyota Fortuner');
+    expect(html).not.toContain(cretaUrlEncoded);
+  });
+
+  it('verifies seamless sequential switching across Creta -> City -> Nexon -> XUV700 -> Fortuner', () => {
+    const sequence = [
+      { id: 'hyundai-creta', name: 'Hyundai Creta', key: 'hyundai_creta', path: '/assets/vehicles/hyundai-creta.jpg' },
+      { id: 'honda-city', name: 'Honda City', key: 'honda_city', path: '/assets/vehicles/honda-city.jpg' },
+      { id: 'tata-nexon', name: 'Tata Nexon', key: 'tata_nexon', path: '/assets/vehicles/tata-nexon.jpg' },
+      { id: 'mahindra-xuv700', name: 'Mahindra XUV700', key: 'mahindra_xuv700', path: '/assets/vehicles/mahindra-xuv700.png' },
+      { id: 'toyota-fortuner', name: 'Toyota Fortuner', key: 'toyota_fortuner', path: '/assets/vehicles/toyota-fortuner.jpg' }
+    ];
+
+    let previousPath = null;
+
+    sequence.forEach(step => {
+      const demo = DEMO_VEHICLES.find(d => d.id === step.id);
+      expect(demo).toBeDefined();
+      localStorage.setItem('garage_vehicle', JSON.stringify(demo));
+
+      const html = renderToString(
+        <AppProvider>
+          <MemoryRouter>
+            <DashboardView />
+          </MemoryRouter>
+        </AppProvider>
+      );
+
+      // Verify exact name and local image path
+      expect(html).toContain(step.name);
+      expect(html).toContain(step.path);
+
+      // Verify no "Vehicle image unavailable" text appears
+      expect(html).not.toContain('Vehicle image unavailable');
+
+      // Verify previous image is not retained
+      if (previousPath) {
+        expect(html).not.toContain(previousPath);
+      }
+      previousPath = step.path;
+    });
+  });
 });

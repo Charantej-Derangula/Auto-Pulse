@@ -32,6 +32,7 @@ import { useApp } from '../context/AppContext';
 import { VehicleHealthModal } from '../components/VehicleHealthModal';
 import { calculateDocumentStatus, calculateReminderStatus } from '../services/DocumentService';
 import { getVehicleImage, NEUTRAL_VEHICLE_FALLBACK } from '../services/VehicleService';
+import { VehicleSetupView } from './VehicleSetupView';
 
 export function DashboardView() {
   const navigate = useNavigate();
@@ -55,16 +56,16 @@ export function DashboardView() {
   const [isAnalyzingEstimate, setIsAnalyzingEstimate] = useState(false);
   const [estimateResult, setEstimateResult] = useState(null);
 
-  const currentVehicleId = vehicle?.id || vehicle?.vehicleId || 'honda-city';
+  const currentVehicleId = vehicle?.id || vehicle?.vehicleId;
 
   // Live Vehicle Document & Reminder Alerts calculation
   const complianceAlerts = useMemo(() => {
     const alerts = [];
-    const vDocs = Array.isArray(documents)
-      ? documents.filter(d => (d.vehicleId === currentVehicleId || (!d.vehicleId && currentVehicleId === 'honda-city')))
+    const vDocs = Array.isArray(documents) && currentVehicleId
+      ? documents.filter(d => d.vehicleId === currentVehicleId)
       : [];
-    const vRems = Array.isArray(reminders)
-      ? reminders.filter(r => (r.vehicleId === currentVehicleId || (!r.vehicleId && currentVehicleId === 'honda-city')))
+    const vRems = Array.isArray(reminders) && currentVehicleId
+      ? reminders.filter(r => r.vehicleId === currentVehicleId)
       : [];
 
     vDocs.forEach(doc => {
@@ -112,6 +113,11 @@ export function DashboardView() {
 
     return alerts;
   }, [documents, reminders, currentVehicleId]);
+
+  // If authenticated user has no saved vehicle, render dedicated VehicleSetupView
+  if (!vehicle) {
+    return <VehicleSetupView />;
+  }
 
   const handleQuickDiagnose = (symptomKey) => {
     if (symptomKey) {
@@ -243,7 +249,7 @@ export function DashboardView() {
 
         <div className="kpi-card">
           <div className="kpi-top">
-            <span className="kpi-label">Vehicle Health Score</span>
+            <span className="kpi-label">Estimated Vehicle Health</span>
             <div className={`kpi-icon-wrap ${vehicleHealth?.overallScore >= 90 ? 'green' : vehicleHealth?.overallScore >= 75 ? 'blue' : 'amber'}`}>
               <HeartPulse size={20} />
             </div>

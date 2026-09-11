@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AppProvider, useApp } from '../../context/AppContext';
+import { AppProvider, useApp, DEMO_VEHICLES } from '../../context/AppContext';
 import { Sidebar } from '../../components/Sidebar';
 import { Header } from '../../components/Header';
 import { Login } from '../../components/Login';
@@ -113,22 +113,32 @@ describe('AutoPulse Authentication & Route Protection Suite', () => {
     expect(html).toMatch(/autocomplete="new-password"/i);
   });
 
-  it('5. Authenticated user with autopulse_auth=true renders Dashboard and protected views', () => {
+  it('5. Authenticated user with no saved vehicle renders the premium Add your vehicle setup interface', () => {
     store['autopulse_auth'] = 'true';
     const html = renderApp('/dashboard');
-    expect(html).toContain('Good Morning');
-    expect(html).toContain('Vehicle Health Score');
+    expect(html).toContain('Add your vehicle');
+    expect(html).toContain('Set up your vehicle to unlock your personalized AutoPulse experience.');
+    expect(html).toContain('Save Vehicle');
     expect(html).not.toContain('Welcome Back');
   });
 
-  it('6. Malformed or corrupted auth storage safely defaults to unauthenticated', () => {
+  it('6. Authenticated user with a saved vehicle renders active Dashboard telemetry', () => {
+    store['autopulse_auth'] = 'true';
+    store['garage_vehicle'] = JSON.stringify(DEMO_VEHICLES[0]);
+    const html = renderApp('/dashboard');
+    expect(html).toContain('Good Morning');
+    expect(html).toContain('Estimated Vehicle Health');
+    expect(html).not.toContain('Welcome Back');
+  });
+
+  it('7. Malformed or corrupted auth storage safely defaults to unauthenticated', () => {
     store['autopulse_auth'] = 'CORRUPTED_JSON_VALUE';
     const html = renderApp('/login');
     expect(html).toContain('Welcome Back');
     expect(html).toContain('Sign In to Garage Dashboard');
   });
 
-  it('7. False auth value safely renders Login page', () => {
+  it('8. False auth value safely renders Login page', () => {
     store['autopulse_auth'] = 'false';
     const html = renderApp('/login');
     expect(html).toContain('Welcome Back');

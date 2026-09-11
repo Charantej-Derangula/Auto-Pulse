@@ -833,7 +833,7 @@ export function AppProvider({ children }) {
     } catch (e) {
       console.warn('[AppContext] Malformed vehicle in storage:', e);
     }
-    return DEMO_VEHICLES[0];
+    return null;
   });
 
   const [isVehicleLoading, setIsVehicleLoading] = useState(false);
