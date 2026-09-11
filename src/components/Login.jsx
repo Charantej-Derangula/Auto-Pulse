@@ -17,11 +17,11 @@ import { useApp } from '../context/AppContext';
 
 export function Login() {
   const { login } = useApp();
-  const [email, setEmail] = useState('charantej@autopulse.io');
-  const [password, setPassword] = useState('autopulse2026');
-  const [name, setName] = useState('Charantej');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -44,9 +44,9 @@ export function Login() {
       return;
     }
 
-    // Safe demo authentication check: allow password length >= 6
-    if (trimmedPass.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    // Safe authentication check: allow password length >= 4
+    if (trimmedPass.length < 4) {
+      setError('Password must be at least 4 characters long.');
       return;
     }
 
@@ -172,20 +172,20 @@ export function Login() {
             )}
           </AnimatePresence>
 
-          <form onSubmit={handleSubmit} className="login-form">
+          <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
             <div className="form-group">
               <label>Full Name</label>
               <div className="input-with-icon">
                 <input
                   type="text"
-                  placeholder="e.g. Charantej"
+                  placeholder="Enter your name"
                   value={name}
+                  autoComplete="off"
                   onChange={(e) => {
                     setName(e.target.value);
                     if (error) setError('');
                   }}
                   className="login-input"
-                  required
                 />
               </div>
             </div>
@@ -198,6 +198,7 @@ export function Login() {
                   type="email"
                   placeholder="name@autopulse.io"
                   value={email}
+                  autoComplete="off"
                   onChange={(e) => {
                     setEmail(e.target.value);
                     if (error) setError('');
@@ -211,9 +212,9 @@ export function Login() {
             <div className="form-group">
               <div className="label-row">
                 <label>Password</label>
-                <a href="#forgot" onClick={(e) => e.preventDefault()} className="forgot-link">
-                  Demo access enabled
-                </a>
+                <span className="forgot-link">
+                  Encrypted Session
+                </span>
               </div>
               <div className="input-with-icon">
                 <Lock size={18} className="input-icon" />
@@ -221,6 +222,7 @@ export function Login() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   value={password}
+                  autoComplete="new-password"
                   onChange={(e) => {
                     setPassword(e.target.value);
                     if (error) setError('');

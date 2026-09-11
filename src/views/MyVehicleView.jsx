@@ -236,7 +236,7 @@ export function MyVehicleView() {
       <div className="vehicle-profile-hero">
         <div className="vehicle-profile-image-wrap">
           <img 
-            src={getVehicleImage(vehicle) || vehicle?.image || vehicle?.imageUrl || NEUTRAL_VEHICLE_FALLBACK} 
+            src={getVehicleImage(vehicle) || NEUTRAL_VEHICLE_FALLBACK} 
             alt={`${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''}`}
             loading="lazy"
             onError={(e) => {

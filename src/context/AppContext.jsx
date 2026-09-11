@@ -765,12 +765,19 @@ export function AppProvider({ children }) {
   // Authentication State (defaults to false for first visit, persisted safely with corruption recovery)
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     try {
-      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return false;
-      const localAuth = localStorage.getItem('autopulse_auth');
-      const sessionAuth = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('autopulse_auth') : null;
+      let localAuth = null;
+      let sessionAuth = null;
+      try {
+        if (typeof localStorage !== 'undefined') localAuth = localStorage.getItem('autopulse_auth');
+      } catch (_) {}
+      try {
+        if (typeof sessionStorage !== 'undefined') sessionAuth = sessionStorage.getItem('autopulse_auth');
+      } catch (_) {}
+
       const val = localAuth !== null ? localAuth : sessionAuth;
-      if (val === null) return false;
-      return JSON.parse(val) === true;
+      if (!val) return false;
+      const parsed = JSON.parse(val);
+      return parsed === true;
     } catch (e) {
       console.warn('[AppContext] Malformed auth storage, resetting to unauthenticated:', e);
       try {
@@ -814,12 +821,12 @@ export function AppProvider({ children }) {
   // Active Vehicle State
   const [vehicle, setVehicle] = useState(() => {
     try {
-      if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      if (typeof localStorage !== 'undefined') {
         const savedVehicle = localStorage.getItem('garage_vehicle') || localStorage.getItem('autopulse_vehicle');
         if (savedVehicle) {
           const parsed = JSON.parse(savedVehicle);
           if (parsed && typeof parsed === 'object') {
-            return buildVehicleObject(parsed, parsed.image || parsed.imageUrl);
+            return buildVehicleObject(parsed);
           }
         }
       }

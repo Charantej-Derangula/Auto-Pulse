@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { 
   getVehicleImage, 
   resolveVehicleImage, 
@@ -7,7 +7,7 @@ import {
   NEUTRAL_VEHICLE_FALLBACK 
 } from './VehicleService';
 
-describe('VehicleService - Exact Vehicle Name & Image Matching Engine', () => {
+describe('VehicleService - External API Integration & Exact Vehicle Matching Engine', () => {
   const REQUIRED_MODELS = [
     { make: 'Honda', model: 'City', expectedKey: 'honda_city' },
     { make: 'Hyundai', model: 'Creta', expectedKey: 'hyundai_creta' },
@@ -37,6 +37,15 @@ describe('VehicleService - Exact Vehicle Name & Image Matching Engine', () => {
     });
   });
 
+  it('resolveVehicleImage resolves asynchronously with caching support', async () => {
+    const cretaImg = await resolveVehicleImage('Hyundai', 'Creta');
+    expect(cretaImg).toBe(VERIFIED_VEHICLE_IMAGES['hyundai_creta']);
+
+    // Second call should return from local cache
+    const cachedCreta = await resolveVehicleImage('Hyundai', 'Creta');
+    expect(cachedCreta).toBe(cretaImg);
+  });
+
   it('returns neutral fallback for unknown or unlisted vehicles without showing a misleading car', () => {
     const unknownImg = getVehicleImage('Pagani', 'Zonda Unknown Edition');
     expect(unknownImg).toBe(NEUTRAL_VEHICLE_FALLBACK);
@@ -48,6 +57,7 @@ describe('VehicleService - Exact Vehicle Name & Image Matching Engine', () => {
   it('buildVehicleObject guarantees displayName is always make + model and retains vehicleId', () => {
     const input = {
       id: 'custom-vehicle-1',
+      vehicleId: 'custom-vehicle-1',
       manufacturer: 'Hyundai',
       model: 'Venue',
       year: '2023'
@@ -60,6 +70,12 @@ describe('VehicleService - Exact Vehicle Name & Image Matching Engine', () => {
     expect(built.id).toBe('custom-vehicle-1');
     expect(built.vehicleId).toBe('custom-vehicle-1');
     expect(built.image).toBe(VERIFIED_VEHICLE_IMAGES['hyundai_venue']);
+  });
+
+  it('ensures all 9 required vehicles have 100% distinct, unique image URLs', () => {
+    const images = REQUIRED_MODELS.map(({ make, model }) => getVehicleImage(make, model));
+    const uniqueImages = new Set(images);
+    expect(uniqueImages.size).toBe(REQUIRED_MODELS.length);
   });
 
   it('switching vehicle updates image and name synchronously without retaining old image', async () => {

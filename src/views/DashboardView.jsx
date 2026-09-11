@@ -342,7 +342,7 @@ export function DashboardView() {
 
           <div className="car-backdrop-visual">
             <img
-              src={getVehicleImage(vehicle) || vehicle?.image || vehicle?.imageUrl || NEUTRAL_VEHICLE_FALLBACK}
+              src={getVehicleImage(vehicle) || NEUTRAL_VEHICLE_FALLBACK}
               alt={`${vehicle?.manufacturer || 'Vehicle'} ${vehicle?.model || ''}`}
               loading="lazy"
               onError={(e) => {
